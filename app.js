@@ -18,21 +18,18 @@ app.post('/', async function (req, res, next) {
   const decisionmakingFlow = await getDecisionmakingFlow(decisionmakingFlowUri);
 
   if (!decisionmakingFlow) {
-    // Could not find decisionmaking flow
-    return res.status(404).end();
+    return next({ message: 'Could not find decisionmaking flow', status: 404 });
   }
 
   const isReady = await isDecisionMakingFlowReadyForVP(decisionmakingFlowUri);
 
   if (!isReady) {
-    // Decisionmaking flow isn't ready to be sent to the VP
-    return res.status(400).end();
+    return next({ message: 'Decisionmaking flow is not ready to be sent to the Flemish Parliament API', status: 400 });
   }
 
   const piecesResponse = await getPieces(decisionmakingFlowUri);
   if (!piecesResponse?.results?.bindings) {
-    // Could not find any pieces to send for decisionmaking flow
-    return res.status(404).end();
+    return next({ message: 'Could not find any pieces to send for decisionmaking flow', status: 404 });
   }
 
   const uris = piecesResponse.results.bindings.map((b) => b.uri.value);
