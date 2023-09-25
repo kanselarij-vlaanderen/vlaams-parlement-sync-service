@@ -18,3 +18,11 @@ vlaams-parlement-sync:
     - ./data/files:/share # To access the files
     - ./data/debug:/debug # Writes payload.json for debug purposes — warning! it's a big file! your editor may struggle to open it
 ```
+
+Add the following snippet to your `dispatcher.ex` config file to expose this service's endpoint.
+
+``` elixir
+match "/vlaams-parlement-sync/*path", @json_service do
+  Proxy.forward conn, path, "http://vlaams-parlement-sync/"
+end
+```
