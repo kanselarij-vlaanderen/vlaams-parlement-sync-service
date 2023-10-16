@@ -3,6 +3,7 @@ import fs from 'fs';
 import bodyParser from 'body-parser';
 import VP from './lib/vp';
 import { getDecisionmakingFlow, getFiles, getPieces, isDecisionMakingFlowReadyForVP } from './lib/decisionmaking-flow';
+import { ENABLE_DEBUG_FILE_WRITING, ENABLE_SENDING_TO_VP_API } from './config';
 
 app.use(bodyParser.json());
 
@@ -93,14 +94,20 @@ app.post('/', async function (req, res, next) {
   };
 
   // For debugging
-  fs.writeFileSync('/debug/payload.json', JSON.stringify(payload, null, 2));
+  if (ENABLE_DEBUG_FILE_WRITING) {
+    fs.writeFileSync('/debug/payload.json', JSON.stringify(payload, null, 2));
+  }
 
-  const response = await VP.sendDossier(payload);
+  if (ENABLE_SENDING_TO_VP_API) {
+    const response = await VP.sendDossier(payload);
 
-  if (response.ok) {
-    return res.status(200).end();
+    if (response.ok) {
+      return res.status(200).end();
+    } else {
+      return res.status(202).end();
+    }
   } else {
-    return res.status(202).end();
+    return res.status(204).end();
   }
 });
 
