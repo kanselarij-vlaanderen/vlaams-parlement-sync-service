@@ -86,7 +86,7 @@ app.post('/', async function (req, res, next) {
                 format: file.format,
                 content,
               }
-            })[0] // TODO: this should be an array, not an object, as each piece can have multiple files (Word & PDF), but needs to be agreed upon with VP
+            })
           })
         ),
       }
