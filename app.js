@@ -93,6 +93,22 @@ app.post('/', async function (req, res, next) {
     }
   };
 
+  const currentUser = await fetchCurrentUser(req.headers['mu-session-id']);
+
+  const parliamentId = "SomeExampleId";
+
+  let { parliamentFlow, parliamentSubcase } = await getParliamentFlowAndSubcase(
+    decisionmakingFlowUri
+  );
+
+  parliamentFlow ??= await createParliamentFlow(
+    parliamentId,
+    decisionmakingFlowUri
+  );
+  parliamentSubcase ??= await createParliamentSubcase(parliamentFlow);
+
+  await createSubmissionActivity(parliamentSubcase, pieces, currentUser);
+
   // For debugging
   if (ENABLE_DEBUG_FILE_WRITING) {
     fs.writeFileSync('/debug/payload.json', JSON.stringify(payload, null, 2));
