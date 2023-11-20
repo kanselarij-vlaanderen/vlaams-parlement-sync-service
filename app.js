@@ -14,6 +14,19 @@ import {
 
 app.use(bodyParser.json());
 
+app.get('/is-ready-for-vp/', async function (req, res, next) {
+  const uri = req.query.uri;
+  const decisionmakingFlow = await getDecisionmakingFlow(uri);
+
+  if (!decisionmakingFlow) {
+    return next({ message: 'Could not find decisionmaking flow', status: 404 });
+  }
+
+  const isReady = await isDecisionMakingFlowReadyForVP(uri);
+
+  return res.send({ isReady }).end();
+});
+
 app.post('/', async function (req, res, next) {
   console.log("Sending dossier...");
 
@@ -123,6 +136,7 @@ app.post('/', async function (req, res, next) {
 
   if (ENABLE_SENDING_TO_VP_API) {
     const response = await VP.sendDossier(payload);
+    console.log(response);
 
     if (response.ok) {
       return res.status(200).end();
