@@ -106,7 +106,7 @@ app.post('/', async function (req, res, next) {
                 format: file.format,
                 content,
               }
-            })
+            })[0] // TODO: send the whole array when the API supports it
           })
         ),
       }
