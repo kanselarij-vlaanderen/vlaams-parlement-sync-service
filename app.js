@@ -89,7 +89,7 @@ app.post('/', async function (req, res, next) {
             'Stuk.naam': piece.name,
             'Stuk.creatiedatum': piece.created.toISOString(),
             'Stuk.type': piece.type.uri,
-            // TODO: it's propably more helpful for them to have the type label instead of only the type URI
+            // TODO: it's probably more helpful for them to have the type label instead of only the type URI
             // 'Stuk.type': {
             //   '@id': piece.type.uri,
             //   '@type': 'Concept',
@@ -100,11 +100,16 @@ app.post('/', async function (req, res, next) {
                 file.shareUri.replace('share://', '/share/'),
                 { encoding: 'base64' }
               );
+              let filename = piece.name;
+              if (file.isSigned) {
+                filename += ' (ondertekend)';
+              }
+              filename += `.${file.extension}`;
               return {
                 '@id': file.uri,
                 '@type': 'http://www.w3.org/ns/dcat#Distribution',
                 format: file.format,
-                filename: file.name,
+                filename: filename,
                 content,
               }
             })
