@@ -114,21 +114,6 @@ app.post('/', async function (req, res, next) {
     }
   };
 
-  const currentUser = await fetchCurrentUser(req.headers['mu-session-id']);
-
-  const parliamentId = "SomeExampleId";
-
-  let { parliamentFlow, parliamentSubcase } = await getParliamentFlowAndSubcase(
-    decisionmakingFlowUri
-  );
-
-  parliamentFlow ??= await createParliamentFlow(
-    parliamentId,
-    decisionmakingFlowUri
-  );
-  parliamentSubcase ??= await createParliamentSubcase(parliamentFlow);
-
-  await createSubmissionActivity(parliamentSubcase, pieces, currentUser);
 
   // For debugging
   if (ENABLE_DEBUG_FILE_WRITING) {
@@ -137,12 +122,27 @@ app.post('/', async function (req, res, next) {
 
   if (ENABLE_SENDING_TO_VP_API) {
     const response = await VP.sendDossier(payload);
-    console.log(response);
 
     if (response.ok) {
+      const responseJson = await response.json();
+      const currentUser = await fetchCurrentUser(req.headers["mu-session-id"]);
+
+      const parliamentId = responseJson.pobj;
+
+      let { parliamentFlow, parliamentSubcase } =
+        await getParliamentFlowAndSubcase(decisionmakingFlowUri);
+
+      parliamentFlow ??= await createParliamentFlow(
+        parliamentId,
+        decisionmakingFlowUri
+      );
+      parliamentSubcase ??= await createParliamentSubcase(parliamentFlow);
+
+      await createSubmissionActivity(parliamentSubcase, pieces, currentUser);
+
       return res.status(200).end();
     } else {
-      return res.status(202).end();
+      return res.status(500).end();
     }
   } else {
     return res.status(204).end();
