@@ -104,9 +104,10 @@ app.post('/', async function (req, res, next) {
                 '@id': file.uri,
                 '@type': 'http://www.w3.org/ns/dcat#Distribution',
                 format: file.format,
+                filename: file.name,
                 content,
               }
-            })[0] // TODO: send the whole array when the API supports it
+            })
           })
         ),
       }
