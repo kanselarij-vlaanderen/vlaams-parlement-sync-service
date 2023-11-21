@@ -125,6 +125,9 @@ app.post('/', async function (req, res, next) {
 
     if (response.ok) {
       const responseJson = await response.json();
+      if (ENABLE_DEBUG_FILE_WRITING) {
+        fs.writeFileSync('/debug/response.json', JSON.stringify(responseJson, null, 2));
+      }
       const currentUser = await fetchCurrentUser(req.headers["mu-session-id"]);
 
       const parliamentId = responseJson.pobj;
@@ -142,6 +145,9 @@ app.post('/', async function (req, res, next) {
 
       return res.status(200).end();
     } else {
+      if (ENABLE_DEBUG_FILE_WRITING) {
+        fs.writeFileSync('/debug/response.json', JSON.stringify(response, null, 2));
+      }
       return res.status(500).end();
     }
   } else {
