@@ -11,9 +11,9 @@
   },
   "author": "redpencil.io",
   "license": "MIT",
-  "devDependencies": {
-    "node-fetch": "^2.6.0",
+  "dependencies": {
     "base-64": "^1.0.0",
-    "fs-extra": "^9.1.0"
+    "fs-extra": "^9.1.0",
+    "node-fetch": "^2.6.0"
   }
 }
