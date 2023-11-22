@@ -6,8 +6,8 @@ function isTruthy(value) {
   return [true, 'true', 1, '1', 'yes', 'Y', 'on'].includes(value);
 }
 
-const ENABLE_DEBUG_FILE_WRITING = isTruthy(process.env.ENABLE_DEBUG_FILE_WRITING) || true;
-const ENABLE_SENDING_TO_VP_API = isTruthy(process.env.ENABLE_SENDING_TO_VP_API) || false;
+const ENABLE_DEBUG_FILE_WRITING = isTruthy(process.env.ENABLE_DEBUG_FILE_WRITING);
+const ENABLE_SENDING_TO_VP_API = isTruthy(process.env.ENABLE_SENDING_TO_VP_API);
 
 const DOCUMENT_TYPES = {
   BESLISSINGSFICHE: 'http://themis.vlaanderen.be/id/concept/document-type/e807feec-1958-46cf-a558-3379b5add49e',
