@@ -48,13 +48,12 @@ app.post('/', async function (req, res, next) {
     return next({ message: 'Decisionmaking flow is not ready to be sent to the Flemish Parliament API', status: 400 });
   }
 
-  const piecesResponse = await getAllPieces(decisionmakingFlowUri);
-  if (!piecesResponse?.results?.bindings) {
+  const piecesUris = await getAllPieces(decisionmakingFlowUri);
+  if (!piecesUris.length) {
     return next({ message: 'Could not find any pieces to send for decisionmaking flow', status: 404 });
   }
 
-  const uris = piecesResponse.results.bindings.map((b) => b.uri.value);
-  const pieces = await getFiles(uris);
+  const pieces = await getFiles(piecesUris);
 
   const payload = {
     '@context': [
