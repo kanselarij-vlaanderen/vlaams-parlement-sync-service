@@ -2,7 +2,7 @@ import { app, errorHandler } from 'mu';
 import fs from 'fs';
 import bodyParser from 'body-parser';
 import VP from './lib/vp';
-import { getDecisionmakingFlow, getFiles, getPieces, isDecisionMakingFlowReadyForVP } from './lib/decisionmaking-flow';
+import { getDecisionmakingFlow, getFiles, getAllPieces, isDecisionMakingFlowReadyForVP } from './lib/decisionmaking-flow';
 import { ENABLE_DEBUG_FILE_WRITING, ENABLE_SENDING_TO_VP_API } from './config';
 import { fetchCurrentUser } from './lib/utils';
 import {
@@ -48,7 +48,7 @@ app.post('/', async function (req, res, next) {
     return next({ message: 'Decisionmaking flow is not ready to be sent to the Flemish Parliament API', status: 400 });
   }
 
-  const piecesResponse = await getPieces(decisionmakingFlowUri);
+  const piecesResponse = await getAllPieces(decisionmakingFlowUri);
   if (!piecesResponse?.results?.bindings) {
     return next({ message: 'Could not find any pieces to send for decisionmaking flow', status: 404 });
   }
