@@ -4,8 +4,28 @@ import bodyParser from 'body-parser';
 import VP from './lib/vp';
 import { getDecisionmakingFlow, getFiles, getPieces, isDecisionMakingFlowReadyForVP } from './lib/decisionmaking-flow';
 import { ENABLE_DEBUG_FILE_WRITING, ENABLE_SENDING_TO_VP_API } from './config';
+import { fetchCurrentUser } from './lib/utils';
+import {
+  getParliamentFlowAndSubcase,
+  createParliamentFlow,
+  createParliamentSubcase,
+  createSubmissionActivity,
+} from "./lib/parliament-flow";
 
 app.use(bodyParser.json());
+
+app.get('/is-ready-for-vp/', async function (req, res, next) {
+  const uri = req.query.uri;
+  const decisionmakingFlow = await getDecisionmakingFlow(uri);
+
+  if (!decisionmakingFlow) {
+    return next({ message: 'Could not find decisionmaking flow', status: 404 });
+  }
+
+  const isReady = await isDecisionMakingFlowReadyForVP(uri);
+
+  return res.send({ isReady }).end();
+});
 
 app.post('/', async function (req, res, next) {
   console.log("Sending dossier...");
@@ -69,7 +89,7 @@ app.post('/', async function (req, res, next) {
             'Stuk.naam': piece.name,
             'Stuk.creatiedatum': piece.created.toISOString(),
             'Stuk.type': piece.type.uri,
-            // TODO: it's propably more helpful for them to have the type label instead of only the type URI
+            // TODO: it's probably more helpful for them to have the type label instead of only the type URI
             // 'Stuk.type': {
             //   '@id': piece.type.uri,
             //   '@type': 'Concept',
@@ -80,10 +100,16 @@ app.post('/', async function (req, res, next) {
                 file.shareUri.replace('share://', '/share/'),
                 { encoding: 'base64' }
               );
+              let filename = piece.name;
+              if (file.isSigned) {
+                filename += ' (ondertekend)';
+              }
+              filename += `.${file.extension}`;
               return {
                 '@id': file.uri,
                 '@type': 'http://www.w3.org/ns/dcat#Distribution',
                 format: file.format,
+                filename: filename,
                 content,
               }
             })
@@ -92,6 +118,7 @@ app.post('/', async function (req, res, next) {
       }
     }
   };
+
 
   // For debugging
   if (ENABLE_DEBUG_FILE_WRITING) {
@@ -102,9 +129,31 @@ app.post('/', async function (req, res, next) {
     const response = await VP.sendDossier(payload);
 
     if (response.ok) {
+      const responseJson = await response.json();
+      if (ENABLE_DEBUG_FILE_WRITING) {
+        fs.writeFileSync('/debug/response.json', JSON.stringify(responseJson, null, 2));
+      }
+      const currentUser = await fetchCurrentUser(req.headers["mu-session-id"]);
+
+      const parliamentId = responseJson.pobj;
+
+      let { parliamentFlow, parliamentSubcase } =
+        await getParliamentFlowAndSubcase(decisionmakingFlowUri);
+
+      parliamentFlow ??= await createParliamentFlow(
+        parliamentId,
+        decisionmakingFlowUri
+      );
+      parliamentSubcase ??= await createParliamentSubcase(parliamentFlow);
+
+      await createSubmissionActivity(parliamentSubcase, pieces, currentUser);
+
       return res.status(200).end();
     } else {
-      return res.status(202).end();
+      if (ENABLE_DEBUG_FILE_WRITING) {
+        fs.writeFileSync('/debug/response.json', JSON.stringify(response, null, 2));
+      }
+      return res.status(500).end();
     }
   } else {
     return res.status(204).end();
