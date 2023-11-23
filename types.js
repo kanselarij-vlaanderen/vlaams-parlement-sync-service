@@ -5,6 +5,7 @@
  * @property {string} altName
  * @property {string} case
  * @property {GovernmentField[]} governmentFields
+ * @property {?string} parliamentFlow
  */
 
 /**
