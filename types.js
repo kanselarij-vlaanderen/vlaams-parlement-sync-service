@@ -35,6 +35,9 @@
  * @property {string} uri
  * @property {string} format
  * @property {string} shareUri
+ * @property {?string} parliamentId
+ * @property {?string} previousVersionUri
+ * @property {?string} previousVersionParliamentId
  * @property {boolean} isPdf
  * @property {boolean} isWord
  * @property {boolean} isSigned

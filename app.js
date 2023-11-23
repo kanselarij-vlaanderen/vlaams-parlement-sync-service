@@ -10,6 +10,7 @@ import {
   createParliamentFlow,
   createParliamentSubcase,
   createSubmissionActivity,
+  enrichPiecesWithPreviousSubmissions,
   createSubmittedPieces,
 } from "./lib/parliament-flow";
 
@@ -74,8 +75,14 @@ app.post('/', async function (req, res, next) {
   if (!piecesUris.length) {
     return next({ message: 'Could not find any pieces to send for decisionmaking flow', status: 404 });
   }
+  let pieces = await getFiles(piecesUris);
+  if (decisionmakingFlow.parliamentFlow) {
+    pieces = await enrichPiecesWithPreviousSubmissions(decisionmakingFlow.parliamentFlow, pieces);
+  }
 
-  const pieces = await getFiles(piecesUris);
+  if (ENABLE_DEBUG_FILE_WRITING) {
+    fs.writeFileSync('/debug/pieces.json', JSON.stringify(pieces, null, 2));
+  }
 
   const payload = VP.generatePayload(decisionmakingFlow, pieces);
 
