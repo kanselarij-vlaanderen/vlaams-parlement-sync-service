@@ -10,6 +10,7 @@ import {
   createParliamentFlow,
   createParliamentSubcase,
   createSubmissionActivity,
+  linkFilesToParliamentFileId,
 } from "./lib/parliament-flow";
 
 app.use(bodyParser.json());
@@ -135,6 +136,7 @@ app.post('/', async function (req, res, next) {
       const currentUser = await fetchCurrentUser(req.headers["mu-session-id"]);
 
       const parliamentId = responseJson.pobj;
+      const filesToParliamentFileId = responseJson.files.map((obj) => ({ uri: obj.id, parliamentFileId: obj.pfls }));
 
       let { parliamentFlow, parliamentSubcase } =
         await getParliamentFlowAndSubcase(decisionmakingFlowUri);
@@ -146,6 +148,7 @@ app.post('/', async function (req, res, next) {
       parliamentSubcase ??= await createParliamentSubcase(parliamentFlow);
 
       await createSubmissionActivity(parliamentSubcase, pieces, currentUser);
+      await linkFilesToParliamentFileId(filesToParliamentFileId);
 
       return res.status(200).end();
     } else {
