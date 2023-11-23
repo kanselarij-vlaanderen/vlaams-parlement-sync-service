@@ -10,7 +10,7 @@ import {
   createParliamentFlow,
   createParliamentSubcase,
   createSubmissionActivity,
-  linkFilesToParliamentFileId,
+  createSubmittedPieces,
 } from "./lib/parliament-flow";
 
 app.use(bodyParser.json());
@@ -95,7 +95,18 @@ app.post('/', async function (req, res, next) {
       const currentUser = await fetchCurrentUser(req.headers["mu-session-id"]);
 
       const parliamentId = responseJson.pobj;
-      const filesToParliamentFileId = responseJson.files.map((obj) => ({ uri: obj.id, parliamentFileId: obj.pfls }));
+      pieces.forEach((piece) => {
+        piece.files.forEach((file) => {
+          const parliamentId = responseJson.files.find((r) => r.id === file.uri)?.pfls;
+          if (parliamentId) {
+            file.parliamentId = parliamentId;
+          }
+        });
+      });
+
+      if (ENABLE_DEBUG_FILE_WRITING) {
+        fs.writeFileSync('/debug/pieces.json', JSON.stringify(pieces, null, 2));
+      }
 
       let { parliamentFlow, parliamentSubcase } =
         await getParliamentFlowAndSubcase(decisionmakingFlowUri);
@@ -106,8 +117,8 @@ app.post('/', async function (req, res, next) {
       );
       parliamentSubcase ??= await createParliamentSubcase(parliamentFlow);
 
-      await createSubmissionActivity(parliamentSubcase, pieces, currentUser);
-      await linkFilesToParliamentFileId(filesToParliamentFileId);
+      const submissionActivity = await createSubmissionActivity(parliamentSubcase, currentUser);
+      await createSubmittedPieces(submissionActivity, pieces)
 
       return res.status(200).end();
     } else {
