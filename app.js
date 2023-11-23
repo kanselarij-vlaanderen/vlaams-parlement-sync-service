@@ -77,69 +77,7 @@ app.post('/', async function (req, res, next) {
 
   const pieces = await getFiles(piecesUris);
 
-  const payload = {
-    '@context': [
-      "https://data.vlaanderen.be/doc/applicatieprofiel/besluitvorming/erkendestandaard/2021-02-04/context/besluitvorming-ap.jsonld",
-      {
-          "Stuk.isVoorgesteldDoor": "https://data.vlaanderen.be/ns/dossier#isVoorgesteldDoor",
-          "Concept": "http://www.w3.org/2004/02/skos/core#Concept",
-          "format": "http://purl.org/dc/terms/format",
-          "content": "http://www.w3.org/ns/prov#value",
-          "prefLabel": "http://www.w3.org/2004/02/skos/core#prefLabel"
-      }
-    ],
-    '@id': decisionmakingFlow.uri,
-    '@type': 'Besluitvormingsaangelegenheid',
-    'Besluitvormingsaangelegenheid.naam': decisionmakingFlow.name,
-    'Besluitvormingsaangelegenheid.alternatieveNaam': decisionmakingFlow.altName,
-    'Besluitvormingsaangelegenheid.beleidsveld': decisionmakingFlow.governmentFields.map(
-      (field) => ({
-        '@id': field.uri,
-        '@type': 'Concept',
-        prefLabel: field.label,
-      })
-    ),
-    '@reverse': {
-      'Dossier.isNeerslagVan': {
-        '@id': decisionmakingFlow.case,
-        '@type': 'Dossier',
-        'Dossier.bestaatUit': pieces.map(
-          (piece) => ({
-            '@id': piece.uri,
-            '@type': 'Stuk',
-            'Stuk.naam': piece.name,
-            'Stuk.creatiedatum': piece.created.toISOString(),
-            'Stuk.type': piece.type.uri,
-            // TODO: it's probably more helpful for them to have the type label instead of only the type URI
-            // 'Stuk.type': {
-            //   '@id': piece.type.uri,
-            //   '@type': 'Concept',
-            //   prefLabel: piece.type.label,
-            // },
-            'Stuk.isVoorgesteldDoor': piece.files.map((file) => {
-              const content = fs.readFileSync(
-                file.shareUri.replace('share://', '/share/'),
-                { encoding: 'base64' }
-              );
-              let filename = piece.name;
-              if (file.isSigned) {
-                filename += ' (ondertekend)';
-              }
-              filename += `.${file.extension}`;
-              return {
-                '@id': file.uri,
-                '@type': 'http://www.w3.org/ns/dcat#Distribution',
-                format: file.format,
-                filename: filename,
-                content,
-              }
-            })
-          })
-        ),
-      }
-    }
-  };
-
+  const payload = VP.generatePayload(decisionmakingFlow, pieces);
 
   // For debugging
   if (ENABLE_DEBUG_FILE_WRITING) {
@@ -182,7 +120,6 @@ app.post('/', async function (req, res, next) {
     return res.status(204).end();
   }
 });
-
 
 /*
  * 1. Fetch necessary data from Kaleidos triplestore
