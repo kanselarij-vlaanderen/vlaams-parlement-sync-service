@@ -6,6 +6,7 @@
  * @property {string} case
  * @property {GovernmentField[]} governmentFields
  * @property {?string} parliamentFlow
+ * @property {?string} pobj
  */
 
 /**
