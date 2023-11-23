@@ -28,6 +28,27 @@ app.get('/is-ready-for-vp/', async function (req, res, next) {
   return res.send({ isReady }).end();
 });
 
+app.get('/pieces-ready-to-be-sent', async function (req, res, next) {
+  const uri = req.query.uri;
+  const decisionmakingFlow = await getDecisionmakingFlow(uri);
+
+  if (!decisionmakingFlow) {
+    return next({ message: 'Could not find decisionmaking flow', status: 404 });
+  }
+
+  const piecesUris = await getAllPieces(uri);
+  const pieces = await getFiles(piecesUris);
+
+  const data = pieces.map((piece) => ({
+    type: 'piece',
+    id: piece.id
+  }));
+
+  return res
+    .status(200)
+    .send({ data });
+});
+
 app.post('/', async function (req, res, next) {
   console.log("Sending dossier...");
 
