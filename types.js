@@ -1,10 +1,4 @@
 /**
- * @typedef {Object} GovernmentField
- * @property {string} uri
- * @property {string} label
- */
-
-/**
  * @typedef {Object} DecisionmakingFlow
  * @property {string} uri
  * @property {string} name
@@ -14,16 +8,15 @@
  */
 
 /**
- * @typedef {Object} Concept
+ * @typedef {Object} GovernmentField
  * @property {string} uri
  * @property {string} label
  */
 
 /**
- * @typedef {Object} File
+ * @typedef {Object} Concept
  * @property {string} uri
- * @property {string} format
- * @property {string} shareUri
+ * @property {string} label
  */
 
 /**
@@ -34,4 +27,12 @@
  * @property {Date} created
  * @property {Concept} type
  * @property {File[]} files
+ */
+
+/**
+ * @typedef {Object} File
+ * @property {string} uri
+ * @property {string} format
+ * @property {string} shareUri
+ * @property {boolean} isSigned
  */
