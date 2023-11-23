@@ -35,5 +35,7 @@
  * @property {string} uri
  * @property {string} format
  * @property {string} shareUri
+ * @property {boolean} isPdf
+ * @property {boolean} isWord
  * @property {boolean} isSigned
  */
