@@ -54,6 +54,7 @@ app.post('/', async function (req, res, next) {
   console.log("Sending dossier...");
 
   const uri = req.query.uri;
+  const comment = req.query.comment;
 
   // Set default URI for debugging purposes.
   // Default URI points to https://kaleidos-test.vlaanderen.be/dossiers/6398392DC2B90D4571CF86EA/deeldossiers
@@ -84,7 +85,7 @@ app.post('/', async function (req, res, next) {
     fs.writeFileSync('/debug/pieces.json', JSON.stringify(pieces, null, 2));
   }
 
-  const payload = VP.generatePayload(decisionmakingFlow, pieces);
+  const payload = VP.generatePayload(decisionmakingFlow, pieces, comment);
 
   // For debugging
   if (ENABLE_DEBUG_FILE_WRITING) {
