@@ -18,6 +18,10 @@ app.use(bodyParser.json());
 
 app.get('/is-ready-for-vp/', async function (req, res, next) {
   const uri = req.query.uri;
+  if (!uri) {
+    return next({ message: 'Query parameter "uri" must be passed in', status: 400 });
+  }
+
   const decisionmakingFlow = await getDecisionmakingFlow(uri);
 
   if (!decisionmakingFlow) {
@@ -31,8 +35,11 @@ app.get('/is-ready-for-vp/', async function (req, res, next) {
 
 app.get('/pieces-ready-to-be-sent', async function (req, res, next) {
   const uri = req.query.uri;
-  const decisionmakingFlow = await getDecisionmakingFlow(uri);
+  if (!uri) {
+    return next({ message: 'Query parameter "uri" must be passed in', status: 400 });
+  }
 
+  const decisionmakingFlow = await getDecisionmakingFlow(uri);
   if (!decisionmakingFlow) {
     return next({ message: 'Could not find decisionmaking flow', status: 404 });
   }
@@ -54,6 +61,10 @@ app.post('/', async function (req, res, next) {
   console.log("Sending dossier...");
 
   const uri = req.query.uri;
+  if (!uri) {
+    return next({ message: 'Query parameter "uri" must be passed in', status: 400 });
+  }
+
   const comment = req.query.comment;
 
   // Set default URI for debugging purposes.
