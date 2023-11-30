@@ -88,6 +88,11 @@ app.post('/', async function (req, res, next) {
     return next({ message: 'Could not find any pieces to send for decisionmaking flow', status: 404 });
   }
   let pieces = await getFiles(piecesUris);
+
+  if (pieces.length === 0) {
+    return next({ message: 'Could not find any files to send for decisionmaking flow', status: 404 });
+  }
+
   if (decisionmakingFlow.parliamentFlow) {
     pieces = await enrichPiecesWithPreviousSubmissions(decisionmakingFlow.parliamentFlow, pieces);
   }
