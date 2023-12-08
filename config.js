@@ -31,6 +31,12 @@ const ACCESS_LEVELS = {
   PUBLIEK: 'http://themis.vlaanderen.be/id/concept/toegangsniveau/c3de9c70-391e-4031-a85e-4b03433d6266',
 };
 
+const PARLIAMENT_FLOW_STATUSES = {
+  INCOMPLETE: 'http://themis.vlaanderen.be/id/parlementaireaangelegenheid-status/d30fdd4d-ba47-437d-b72e-4bff02e8c3fb',
+  COMPLETE: 'http://themis.vlaanderen.be/id/parlementaireaangelegenheid-status/018fb31c-44ad-4bf5-b01b-76de2d48abf4',
+  BEING_HANDLED: 'http://themis.vlaanderen.be/id/parlementaireaangelegenheid-status/3905d9a1-c841-42fc-8a89-3b7d4ad61b4b',
+};
+
 export {
   DOMAIN,
   VP_API_CLIENT_ID,
@@ -39,6 +45,7 @@ export {
   SUBCASE_TYPES,
   DECISION_RESULT_CODES,
   ACCESS_LEVELS,
+  PARLIAMENT_FLOW_STATUSES,
   ENABLE_DEBUG_FILE_WRITING,
   ENABLE_SENDING_TO_VP_API,
 };

@@ -3,7 +3,7 @@ import fs from 'fs';
 import bodyParser from 'body-parser';
 import VP from './lib/vp';
 import { getDecisionmakingFlow, getFiles, getAllPieces, isDecisionMakingFlowReadyForVP } from './lib/decisionmaking-flow';
-import { ENABLE_DEBUG_FILE_WRITING, ENABLE_SENDING_TO_VP_API } from './config';
+import { ENABLE_DEBUG_FILE_WRITING, ENABLE_SENDING_TO_VP_API, PARLIAMENT_FLOW_STATUSES } from './config';
 import { fetchCurrentUser } from './lib/utils';
 import {
   getParliamentFlowAndSubcase,
@@ -12,6 +12,7 @@ import {
   createSubmissionActivity,
   enrichPiecesWithPreviousSubmissions,
   createSubmittedPieces,
+  updateParliamentFlowStatus,
 } from "./lib/parliament-flow";
 
 app.use(bodyParser.json());
@@ -66,6 +67,7 @@ app.post('/', async function (req, res, next) {
   }
 
   const comment = req.query.comment;
+  const isComplete = req.query.isComplete === 'true';
 
   // Set default URI for debugging purposes.
   // Default URI points to https://kaleidos-test.vlaanderen.be/dossiers/6398392DC2B90D4571CF86EA/deeldossiers
@@ -143,6 +145,13 @@ app.post('/', async function (req, res, next) {
 
       const submissionActivity = await createSubmissionActivity(parliamentSubcase, currentUser);
       await createSubmittedPieces(submissionActivity, pieces)
+
+      await updateParliamentFlowStatus(
+        parliamentFlow,
+        isComplete
+          ? PARLIAMENT_FLOW_STATUSES.COMPLETE
+          : PARLIAMENT_FLOW_STATUSES.INCOMPLETE,
+      );
 
       return res.status(200).end();
     } else {
