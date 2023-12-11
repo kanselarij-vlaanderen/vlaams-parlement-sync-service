@@ -1,9 +1,19 @@
-const DOMAIN = 'https://ws-acc.vlpar.be/';
-const VP_API_CLIENT_ID = 'H8g9HsvY-vTux9D4T2_J4Q..';
-const VP_API_CLIENT_SECRET = 'hs0rIeglv-2wutYjG8tSxA..';
-
 function isTruthy(value) {
   return [true, 'true', 1, '1', 'yes', 'Y', 'on'].includes(value);
+}
+
+const DOMAIN = process.env.VP_API_DOMAIN;
+const VP_API_CLIENT_ID = process.env.VP_API_CLIENT_ID;
+const VP_API_CLIENT_SECRET = process.env.VP_API_CLIENT_SECRET;
+
+if ([DOMAIN, VP_API_CLIENT_ID, VP_API_CLIENT_SECRET].some((envVar) => !envVar)) {
+  console.warn(
+    'Required environment variables were not set. Execution cannot proceed, logging variables and exiting.'
+  );
+  console.warn(`VP_API_DOMAIN: "${DOMAIN}"`);
+  console.warn(`VP_API_CLIENT_ID: "${VP_API_CLIENT_ID}"`);
+  console.warn(`VP_API_CLIENT_SECRET: "${VP_API_CLIENT_SECRET}"`);
+  process.exit(1);
 }
 
 const ENABLE_DEBUG_FILE_WRITING = isTruthy(process.env.ENABLE_DEBUG_FILE_WRITING);
