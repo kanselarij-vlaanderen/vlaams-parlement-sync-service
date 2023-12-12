@@ -143,7 +143,7 @@ app.post('/', async function (req, res, next) {
       );
       parliamentSubcase ??= await createParliamentSubcase(parliamentFlow);
 
-      const submissionActivity = await createSubmissionActivity(parliamentSubcase, currentUser);
+      const submissionActivity = await createSubmissionActivity(parliamentSubcase, currentUser, comment);
       await createSubmittedPieces(submissionActivity, pieces)
 
       await updateParliamentFlowStatus(
