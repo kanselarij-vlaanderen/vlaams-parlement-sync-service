@@ -1,13 +1,23 @@
-const DOMAIN = 'https://ws-acc.vlpar.be/';
-const VP_API_CLIENT_ID = 'H8g9HsvY-vTux9D4T2_J4Q..';
-const VP_API_CLIENT_SECRET = 'hs0rIeglv-2wutYjG8tSxA..';
-
 function isTruthy(value) {
   return [true, 'true', 1, '1', 'yes', 'Y', 'on'].includes(value);
 }
 
-const ENABLE_DEBUG_FILE_WRITING = isTruthy(process.env.ENABLE_DEBUG_FILE_WRITING) || true;
-const ENABLE_SENDING_TO_VP_API = isTruthy(process.env.ENABLE_SENDING_TO_VP_API) || false;
+const DOMAIN = process.env.VP_API_DOMAIN;
+const VP_API_CLIENT_ID = process.env.VP_API_CLIENT_ID;
+const VP_API_CLIENT_SECRET = process.env.VP_API_CLIENT_SECRET;
+
+if ([DOMAIN, VP_API_CLIENT_ID, VP_API_CLIENT_SECRET].some((envVar) => !envVar)) {
+  console.warn(
+    'Required environment variables were not set. Execution cannot proceed, logging variables and exiting.'
+  );
+  console.warn(`VP_API_DOMAIN: "${DOMAIN}"`);
+  console.warn(`VP_API_CLIENT_ID: "${VP_API_CLIENT_ID}"`);
+  console.warn(`VP_API_CLIENT_SECRET: "${VP_API_CLIENT_SECRET}"`);
+  process.exit(1);
+}
+
+const ENABLE_DEBUG_FILE_WRITING = isTruthy(process.env.ENABLE_DEBUG_FILE_WRITING);
+const ENABLE_SENDING_TO_VP_API = isTruthy(process.env.ENABLE_SENDING_TO_VP_API);
 
 const DOCUMENT_TYPES = {
   BESLISSINGSFICHE: 'http://themis.vlaanderen.be/id/concept/document-type/e807feec-1958-46cf-a558-3379b5add49e',
@@ -31,6 +41,12 @@ const ACCESS_LEVELS = {
   PUBLIEK: 'http://themis.vlaanderen.be/id/concept/toegangsniveau/c3de9c70-391e-4031-a85e-4b03433d6266',
 };
 
+const PARLIAMENT_FLOW_STATUSES = {
+  INCOMPLETE: 'http://themis.vlaanderen.be/id/parlementaireaangelegenheid-status/d30fdd4d-ba47-437d-b72e-4bff02e8c3fb',
+  COMPLETE: 'http://themis.vlaanderen.be/id/parlementaireaangelegenheid-status/018fb31c-44ad-4bf5-b01b-76de2d48abf4',
+  BEING_HANDLED: 'http://themis.vlaanderen.be/id/parlementaireaangelegenheid-status/3905d9a1-c841-42fc-8a89-3b7d4ad61b4b',
+};
+
 export {
   DOMAIN,
   VP_API_CLIENT_ID,
@@ -39,6 +55,7 @@ export {
   SUBCASE_TYPES,
   DECISION_RESULT_CODES,
   ACCESS_LEVELS,
+  PARLIAMENT_FLOW_STATUSES,
   ENABLE_DEBUG_FILE_WRITING,
   ENABLE_SENDING_TO_VP_API,
 };

@@ -2,20 +2,27 @@ import { app, errorHandler } from 'mu';
 import fs from 'fs';
 import bodyParser from 'body-parser';
 import VP from './lib/vp';
-import { getDecisionmakingFlow, getFiles, getPieces, isDecisionMakingFlowReadyForVP } from './lib/decisionmaking-flow';
-import { ENABLE_DEBUG_FILE_WRITING, ENABLE_SENDING_TO_VP_API } from './config';
+import { getDecisionmakingFlow, getFiles, getAllPieces, isDecisionMakingFlowReadyForVP } from './lib/decisionmaking-flow';
+import { ENABLE_DEBUG_FILE_WRITING, ENABLE_SENDING_TO_VP_API, PARLIAMENT_FLOW_STATUSES } from './config';
 import { fetchCurrentUser } from './lib/utils';
 import {
   getParliamentFlowAndSubcase,
   createParliamentFlow,
   createParliamentSubcase,
   createSubmissionActivity,
+  enrichPiecesWithPreviousSubmissions,
+  createSubmittedPieces,
+  updateParliamentFlowStatus,
 } from "./lib/parliament-flow";
 
 app.use(bodyParser.json());
 
 app.get('/is-ready-for-vp/', async function (req, res, next) {
   const uri = req.query.uri;
+  if (!uri) {
+    return next({ message: 'Query parameter "uri" must be passed in', status: 400 });
+  }
+
   const decisionmakingFlow = await getDecisionmakingFlow(uri);
 
   if (!decisionmakingFlow) {
@@ -27,10 +34,40 @@ app.get('/is-ready-for-vp/', async function (req, res, next) {
   return res.send({ isReady }).end();
 });
 
+app.get('/pieces-ready-to-be-sent', async function (req, res, next) {
+  const uri = req.query.uri;
+  if (!uri) {
+    return next({ message: 'Query parameter "uri" must be passed in', status: 400 });
+  }
+
+  const decisionmakingFlow = await getDecisionmakingFlow(uri);
+  if (!decisionmakingFlow) {
+    return next({ message: 'Could not find decisionmaking flow', status: 404 });
+  }
+
+  const piecesUris = await getAllPieces(uri);
+  const pieces = await getFiles(piecesUris);
+
+  const data = pieces.map((piece) => ({
+    type: 'piece',
+    id: piece.id
+  }));
+
+  return res
+    .status(200)
+    .send({ data });
+});
+
 app.post('/', async function (req, res, next) {
   console.log("Sending dossier...");
 
   const uri = req.query.uri;
+  if (!uri) {
+    return next({ message: 'Query parameter "uri" must be passed in', status: 400 });
+  }
+
+  const comment = req.query.comment;
+  const isComplete = req.query.isComplete === 'true';
 
   // Set default URI for debugging purposes.
   // Default URI points to https://kaleidos-test.vlaanderen.be/dossiers/6398392DC2B90D4571CF86EA/deeldossiers
@@ -48,77 +85,25 @@ app.post('/', async function (req, res, next) {
     return next({ message: 'Decisionmaking flow is not ready to be sent to the Flemish Parliament API', status: 400 });
   }
 
-  const piecesResponse = await getPieces(decisionmakingFlowUri);
-  if (!piecesResponse?.results?.bindings) {
+  const piecesUris = await getAllPieces(decisionmakingFlowUri);
+  if (!piecesUris.length) {
     return next({ message: 'Could not find any pieces to send for decisionmaking flow', status: 404 });
   }
+  let pieces = await getFiles(piecesUris);
 
-  const uris = piecesResponse.results.bindings.map((b) => b.uri.value);
-  const pieces = await getFiles(uris);
+  if (pieces.length === 0) {
+    return next({ message: 'Could not find any files to send for decisionmaking flow', status: 404 });
+  }
 
-  const payload = {
-    '@context': [
-      "https://data.vlaanderen.be/doc/applicatieprofiel/besluitvorming/erkendestandaard/2021-02-04/context/besluitvorming-ap.jsonld",
-      {
-          "Stuk.isVoorgesteldDoor": "https://data.vlaanderen.be/ns/dossier#isVoorgesteldDoor",
-          "Concept": "http://www.w3.org/2004/02/skos/core#Concept",
-          "format": "http://purl.org/dc/terms/format",
-          "content": "http://www.w3.org/ns/prov#value",
-          "prefLabel": "http://www.w3.org/2004/02/skos/core#prefLabel"
-      }
-    ],
-    '@id': decisionmakingFlow.uri,
-    '@type': 'Besluitvormingsaangelegenheid',
-    'Besluitvormingsaangelegenheid.naam': decisionmakingFlow.name,
-    'Besluitvormingsaangelegenheid.alternatieveNaam': decisionmakingFlow.altName,
-    'Besluitvormingsaangelegenheid.beleidsveld': decisionmakingFlow.governmentFields.map(
-      (field) => ({
-        '@id': field.uri,
-        '@type': 'Concept',
-        prefLabel: field.label,
-      })
-    ),
-    '@reverse': {
-      'Dossier.isNeerslagVan': {
-        '@id': decisionmakingFlow.case,
-        '@type': 'Dossier',
-        'Dossier.bestaatUit': pieces.map(
-          (piece) => ({
-            '@id': piece.uri,
-            '@type': 'Stuk',
-            'Stuk.naam': piece.name,
-            'Stuk.creatiedatum': piece.created.toISOString(),
-            'Stuk.type': piece.type.uri,
-            // TODO: it's probably more helpful for them to have the type label instead of only the type URI
-            // 'Stuk.type': {
-            //   '@id': piece.type.uri,
-            //   '@type': 'Concept',
-            //   prefLabel: piece.type.label,
-            // },
-            'Stuk.isVoorgesteldDoor': piece.files.map((file) => {
-              const content = fs.readFileSync(
-                file.shareUri.replace('share://', '/share/'),
-                { encoding: 'base64' }
-              );
-              let filename = piece.name;
-              if (file.isSigned) {
-                filename += ' (ondertekend)';
-              }
-              filename += `.${file.extension}`;
-              return {
-                '@id': file.uri,
-                '@type': 'http://www.w3.org/ns/dcat#Distribution',
-                format: file.format,
-                filename: filename,
-                content,
-              }
-            })
-          })
-        ),
-      }
-    }
-  };
+  if (decisionmakingFlow.parliamentFlow) {
+    pieces = await enrichPiecesWithPreviousSubmissions(decisionmakingFlow.parliamentFlow, pieces);
+  }
 
+  if (ENABLE_DEBUG_FILE_WRITING) {
+    fs.writeFileSync('/debug/pieces.json', JSON.stringify(pieces, null, 2));
+  }
+
+  const payload = VP.generatePayload(decisionmakingFlow, pieces, comment);
 
   // For debugging
   if (ENABLE_DEBUG_FILE_WRITING) {
@@ -136,6 +121,18 @@ app.post('/', async function (req, res, next) {
       const currentUser = await fetchCurrentUser(req.headers["mu-session-id"]);
 
       const parliamentId = responseJson.pobj;
+      pieces.forEach((piece) => {
+        piece.files.forEach((file) => {
+          const parliamentId = responseJson.files.find((r) => r.id === file.uri)?.pfls;
+          if (parliamentId) {
+            file.parliamentId = parliamentId;
+          }
+        });
+      });
+
+      if (ENABLE_DEBUG_FILE_WRITING) {
+        fs.writeFileSync('/debug/pieces.json', JSON.stringify(pieces, null, 2));
+      }
 
       let { parliamentFlow, parliamentSubcase } =
         await getParliamentFlowAndSubcase(decisionmakingFlowUri);
@@ -146,7 +143,15 @@ app.post('/', async function (req, res, next) {
       );
       parliamentSubcase ??= await createParliamentSubcase(parliamentFlow);
 
-      await createSubmissionActivity(parliamentSubcase, pieces, currentUser);
+      const submissionActivity = await createSubmissionActivity(parliamentSubcase, currentUser, comment);
+      await createSubmittedPieces(submissionActivity, pieces)
+
+      await updateParliamentFlowStatus(
+        parliamentFlow,
+        isComplete
+          ? PARLIAMENT_FLOW_STATUSES.COMPLETE
+          : PARLIAMENT_FLOW_STATUSES.INCOMPLETE,
+      );
 
       return res.status(200).end();
     } else {
@@ -159,7 +164,6 @@ app.post('/', async function (req, res, next) {
     return res.status(204).end();
   }
 });
-
 
 /*
  * 1. Fetch necessary data from Kaleidos triplestore
