@@ -103,7 +103,15 @@ app.post('/', async function (req, res, next) {
     fs.writeFileSync('/debug/pieces.json', JSON.stringify(pieces, null, 2));
   }
 
-  const payload = VP.generatePayload(decisionmakingFlow, pieces, comment);
+  let payload;
+  try {
+    payload = VP.generatePayload(decisionmakingFlow, pieces, comment);
+  } catch (error) {
+    return next({
+      message: `An error occurred while creating the payload: "${error.message}"`,
+      status: 500,
+    });
+  }
 
   // For debugging
   if (ENABLE_DEBUG_FILE_WRITING) {
@@ -111,7 +119,13 @@ app.post('/', async function (req, res, next) {
   }
 
   if (ENABLE_SENDING_TO_VP_API) {
-    const response = await VP.sendDossier(payload);
+    let response;
+    try {
+      response = await VP.sendDossier(payload);
+    } catch (error) {
+      console.log(error.message);
+      return res.status(500).send(error.message);
+    }
 
     if (response.ok) {
       const responseJson = await response.json();
@@ -119,6 +133,9 @@ app.post('/', async function (req, res, next) {
         fs.writeFileSync('/debug/response.json', JSON.stringify(responseJson, null, 2));
       }
       const currentUser = await fetchCurrentUser(req.headers["mu-session-id"]);
+      if (!currentUser) {
+        return next({ message: 'Could not find user for session', status: 404 });
+      }
 
       const parliamentId = responseJson.pobj;
       pieces.forEach((piece) => {
@@ -158,7 +175,11 @@ app.post('/', async function (req, res, next) {
       if (ENABLE_DEBUG_FILE_WRITING) {
         fs.writeFileSync('/debug/response.json', JSON.stringify(response, null, 2));
       }
-      return res.status(500).end();
+      return res
+        .status(500)
+        .send(
+          `VP API responded with status ${response.status} and the following message: "${response.statusText}"`
+        );
     }
   } else {
     return res.status(204).end();
