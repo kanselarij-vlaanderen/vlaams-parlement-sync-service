@@ -15,6 +15,8 @@ import {
   updateParliamentFlowStatus,
 } from "./lib/parliament-flow";
 
+const cacheClearTimeout = process.env.CACHE_CLEAR_TIMEOUT || 3000;
+
 app.use(bodyParser.json());
 
 app.get('/is-ready-for-vp/', async function (req, res, next) {
@@ -153,7 +155,9 @@ app.post('/', async function (req, res, next) {
           : PARLIAMENT_FLOW_STATUSES.INCOMPLETE,
       );
 
-      return res.status(200).end();
+      setTimeout(() => {
+        res.status(200).send()        
+      }, cacheClearTimeout);
     } else {
       if (ENABLE_DEBUG_FILE_WRITING) {
         fs.writeFileSync('/debug/response.json', JSON.stringify(response, null, 2));
