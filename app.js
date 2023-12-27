@@ -1,9 +1,19 @@
 import { app, errorHandler } from 'mu';
 import fs from 'fs';
 import bodyParser from 'body-parser';
+import { CronJob } from 'cron';
 import VP from './lib/vp';
-import { getDecisionmakingFlow, getFiles, getAllPieces, isDecisionMakingFlowReadyForVP } from './lib/decisionmaking-flow';
-import { ENABLE_DEBUG_FILE_WRITING, ENABLE_SENDING_TO_VP_API, PARLIAMENT_FLOW_STATUSES } from './config';
+import {
+  getDecisionmakingFlow,
+  getFiles,
+  getAllPieces,
+  isDecisionMakingFlowReadyForVP,
+} from "./lib/decisionmaking-flow";
+import {
+  ENABLE_DEBUG_FILE_WRITING,
+  ENABLE_SENDING_TO_VP_API,
+  PARLIAMENT_FLOW_STATUSES,
+} from "./config";
 import { fetchCurrentUser } from './lib/utils';
 import {
   getParliamentFlowAndSubcase,
@@ -14,6 +24,15 @@ import {
   createSubmittedPieces,
   updateParliamentFlowStatus,
 } from "./lib/parliament-flow";
+import { syncIncompleteFlows } from './lib/sync';
+
+/** Schedule report generation cron job */
+const cronPattern = process.env.POLLING_CRON_PATTERN || '*/10 * * * * *';
+CronJob.from({
+  cronTime: cronPattern,
+  onTick: syncIncompleteFlows,
+  start: true,
+});
 
 app.use(bodyParser.json());
 
