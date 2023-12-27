@@ -24,13 +24,16 @@ import {
   createSubmittedPieces,
   updateParliamentFlowStatus,
 } from "./lib/parliament-flow";
-import { syncIncompleteFlows } from './lib/sync';
+import { syncFlowsByStatus } from './lib/sync';
 
 /** Schedule report generation cron job */
 const cronPattern = process.env.POLLING_CRON_PATTERN || '*/10 * * * * *';
 CronJob.from({
   cronTime: cronPattern,
-  onTick: syncIncompleteFlows,
+  onTick: (async () => {
+    const { COMPLETE, INCOMPLETE } = PARLIAMENT_FLOW_STATUSES;
+    await syncFlowsByStatus([COMPLETE, INCOMPLETE]);
+  }),
   start: true,
 });
 
@@ -76,6 +79,10 @@ app.get('/pieces-ready-to-be-sent', async function (req, res, next) {
     .status(200)
     .send({ data });
 });
+
+app.post('/debug-resync-error-flows', async function (req, res, next) {
+  await syncFlowsByStatus([PARLIAMENT_FLOW_STATUSES.VP_ERROR]);
+})
 
 app.post('/', async function (req, res, next) {
   console.log("Sending dossier...");
