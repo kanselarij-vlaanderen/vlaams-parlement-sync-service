@@ -155,8 +155,8 @@ app.post('/', async function (req, res, next) {
           : PARLIAMENT_FLOW_STATUSES.INCOMPLETE,
       );
 
-      setTimeout(() => {
-        res.status(200).send()        
+      return setTimeout(() => {
+        res.status(200).send()
       }, cacheClearTimeout);
     } else {
       if (ENABLE_DEBUG_FILE_WRITING) {
