@@ -2,17 +2,13 @@ import { app, errorHandler } from 'mu';
 import fs from 'fs';
 import bodyParser from 'body-parser';
 import VP from './lib/vp';
+import { fetchCurrentUser } from "./lib/utils";
 import { getDecisionmakingFlow, getFiles, getAllPieces, isDecisionMakingFlowReadyForVP } from './lib/decisionmaking-flow';
-import { ENABLE_DEBUG_FILE_WRITING, ENABLE_SENDING_TO_VP_API, PARLIAMENT_FLOW_STATUSES } from './config';
-import { fetchCurrentUser } from './lib/utils';
+import { ENABLE_DEBUG_FILE_WRITING, ENABLE_SENDING_TO_VP_API, ENABLE_ALWAYS_CREATE_PARLIAMENT_FLOW, PARLIAMENT_FLOW_STATUSES } from './config';
+
 import {
-  getParliamentFlowAndSubcase,
-  createParliamentFlow,
-  createParliamentSubcase,
-  createSubmissionActivity,
-  enrichPiecesWithPreviousSubmissions,
-  createSubmittedPieces,
-  updateParliamentFlowStatus,
+  createOrUpdateParliamentFlow,
+  enrichPiecesWithPreviousSubmissions
 } from "./lib/parliament-flow";
 
 const cacheClearTimeout = process.env.CACHE_CLEAR_TIMEOUT || 3000;
@@ -71,6 +67,8 @@ app.post('/', async function (req, res, next) {
   const comment = req.query.comment;
   const isComplete = req.query.isComplete === 'true';
 
+  const currentUser = await fetchCurrentUser(req.headers["mu-session-id"]);
+
   // Set default URI for debugging purposes.
   // Default URI points to https://kaleidos-test.vlaanderen.be/dossiers/6398392DC2B90D4571CF86EA/deeldossiers
   const decisionmakingFlowUri = uri ?? 'http://themis.vlaanderen.be/id/besluitvormingsaangelegenheid/6398392DC2B90D4571CF86EA';
@@ -111,7 +109,6 @@ app.post('/', async function (req, res, next) {
   if (ENABLE_DEBUG_FILE_WRITING) {
     fs.writeFileSync('/debug/payload.json', JSON.stringify(payload, null, 2));
   }
-
   if (ENABLE_SENDING_TO_VP_API) {
     const response = await VP.sendDossier(payload);
 
@@ -120,40 +117,7 @@ app.post('/', async function (req, res, next) {
       if (ENABLE_DEBUG_FILE_WRITING) {
         fs.writeFileSync('/debug/response.json', JSON.stringify(responseJson, null, 2));
       }
-      const currentUser = await fetchCurrentUser(req.headers["mu-session-id"]);
-
-      const parliamentId = responseJson.pobj;
-      pieces.forEach((piece) => {
-        piece.files.forEach((file) => {
-          const parliamentId = responseJson.files.find((r) => r.id === file.uri)?.pfls;
-          if (parliamentId) {
-            file.parliamentId = parliamentId;
-          }
-        });
-      });
-
-      if (ENABLE_DEBUG_FILE_WRITING) {
-        fs.writeFileSync('/debug/pieces.json', JSON.stringify(pieces, null, 2));
-      }
-
-      let { parliamentFlow, parliamentSubcase } =
-        await getParliamentFlowAndSubcase(decisionmakingFlowUri);
-
-      parliamentFlow ??= await createParliamentFlow(
-        parliamentId,
-        decisionmakingFlowUri
-      );
-      parliamentSubcase ??= await createParliamentSubcase(parliamentFlow);
-
-      const submissionActivity = await createSubmissionActivity(parliamentSubcase, currentUser, comment);
-      await createSubmittedPieces(submissionActivity, pieces)
-
-      await updateParliamentFlowStatus(
-        parliamentFlow,
-        isComplete
-          ? PARLIAMENT_FLOW_STATUSES.COMPLETE
-          : PARLIAMENT_FLOW_STATUSES.INCOMPLETE,
-      );
+      await createOrUpdateParliamentFlow(mockResponseJson, decisionmakingFlowUri, pieces, currentUser, comment, isComplete);
 
       return setTimeout(() => {
         res.status(200).send()
@@ -165,7 +129,27 @@ app.post('/', async function (req, res, next) {
       return res.status(500).end();
     }
   } else {
-    return res.status(204).end();
+    if (ENABLE_ALWAYS_CREATE_PARLIAMENT_FLOW) {
+      let mockResponseJson = {
+        "status": "SUCCESS",
+        "id": decisionmakingFlowUri,
+        "pobj": "" + Math.floor(100 + Math.random() * 900), // random 3-digit pobj
+        files: pieces.map((piece) => {
+          return {
+            "id": piece.uri,
+            "pobj": "" + Math.floor(100 + Math.random() * 900), // random 4-digit pobj
+          };
+        })
+      }
+      await createOrUpdateParliamentFlow(mockResponseJson, decisionmakingFlowUri, pieces, currentUser, comment, isComplete);
+
+      if (ENABLE_DEBUG_FILE_WRITING) {
+        fs.writeFileSync('/debug/pieces.json', JSON.stringify(pieces, null, 2));
+      }
+    }
+    return setTimeout(() => {
+      return res.status(204).end();
+    }, cacheClearTimeout);
   }
 });
 
