@@ -68,7 +68,9 @@ app.post('/', async function (req, res, next) {
   const isComplete = req.query.isComplete === 'true';
 
   const currentUser = await fetchCurrentUser(req.headers["mu-session-id"]);
-
+  if (!currentUser) {
+    return next({ message: 'Could not find user for session', status: 404 });
+  }
   // Set default URI for debugging purposes.
   // Default URI points to https://kaleidos-test.vlaanderen.be/dossiers/6398392DC2B90D4571CF86EA/deeldossiers
   const decisionmakingFlowUri = uri ?? 'http://themis.vlaanderen.be/id/besluitvormingsaangelegenheid/6398392DC2B90D4571CF86EA';
@@ -103,14 +105,28 @@ app.post('/', async function (req, res, next) {
     fs.writeFileSync('/debug/pieces.json', JSON.stringify(pieces, null, 2));
   }
 
-  const payload = VP.generatePayload(decisionmakingFlow, pieces, comment);
+  let payload;
+  try {
+    payload = VP.generatePayload(decisionmakingFlow, pieces, comment);
+  } catch (error) {
+    return next({
+      message: `An error occurred while creating the payload: "${error.message}"`,
+      status: 500,
+    });
+  }
 
   // For debugging
   if (ENABLE_DEBUG_FILE_WRITING) {
     fs.writeFileSync('/debug/payload.json', JSON.stringify(payload, null, 2));
   }
   if (ENABLE_SENDING_TO_VP_API) {
-    const response = await VP.sendDossier(payload);
+    let response;
+    try {
+      response = await VP.sendDossier(payload);
+    } catch (error) {
+      console.log(error.message);
+      return res.status(500).send({ message: 'Error while sending to VP: ' + error.message });
+    }
 
     if (response.ok) {
       const responseJson = await response.json();
@@ -126,7 +142,15 @@ app.post('/', async function (req, res, next) {
       if (ENABLE_DEBUG_FILE_WRITING) {
         fs.writeFileSync('/debug/response.json', JSON.stringify(response, null, 2));
       }
-      return res.status(500).end();
+      let errorMessage = `VP API responded with status ${response.status} and the following message: "${response.statusText}"`
+      if (response.error && response.error.message) {
+        errorMessage = response.error.message;
+      }
+      return res
+        .status(500)
+        .send({
+          message: errorMessage
+        });
     }
   } else {
     if (ENABLE_ALWAYS_CREATE_PARLIAMENT_FLOW) {
