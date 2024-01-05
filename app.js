@@ -124,7 +124,7 @@ app.post('/', async function (req, res, next) {
       response = await VP.sendDossier(payload);
     } catch (error) {
       console.log(error.message);
-      return res.status(500).send(error.message);
+      return res.status(500).send({ message: 'Error while sending to VP: ' + error.message });
     }
 
     if (response.ok) {
@@ -175,11 +175,15 @@ app.post('/', async function (req, res, next) {
       if (ENABLE_DEBUG_FILE_WRITING) {
         fs.writeFileSync('/debug/response.json', JSON.stringify(response, null, 2));
       }
+      let errorMessage = `VP API responded with status ${response.status} and the following message: "${response.statusText}"`
+      if (response.error && response.error.message) {
+        errorMessage = response.error.message;
+      }
       return res
         .status(500)
-        .send(
-          `VP API responded with status ${response.status} and the following message: "${response.statusText}"`
-        );
+        .send({
+          message: errorMessage
+        });
     }
   } else {
     return res.status(204).end();
