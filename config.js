@@ -5,6 +5,7 @@ function isTruthy(value) {
 const DOMAIN = process.env.VP_API_DOMAIN;
 const VP_API_CLIENT_ID = process.env.VP_API_CLIENT_ID;
 const VP_API_CLIENT_SECRET = process.env.VP_API_CLIENT_SECRET;
+const VP_GRAPH_URI = "http://mu.semte.ch/graphs/system/parliament";
 
 if ([DOMAIN, VP_API_CLIENT_ID, VP_API_CLIENT_SECRET].some((envVar) => !envVar)) {
   console.warn(
@@ -64,4 +65,5 @@ export {
   VP_PARLIAMENT_FLOW_STATUSES,
   ENABLE_DEBUG_FILE_WRITING,
   ENABLE_SENDING_TO_VP_API,
+  VP_GRAPH_URI
 };

@@ -27,7 +27,7 @@ import {
 import { syncFlowsByStatus } from './lib/sync';
 
 /** Schedule report generation cron job */
-const cronPattern = process.env.POLLING_CRON_PATTERN || '*/10 * * * * *';
+const cronPattern = process.env.POLLING_CRON_PATTERN || '*/30 * * * * *';
 CronJob.from({
   cronTime: cronPattern,
   onTick: (async () => {
