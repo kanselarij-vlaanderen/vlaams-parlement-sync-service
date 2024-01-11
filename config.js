@@ -30,6 +30,7 @@ const DOCUMENT_TYPES = {
 
 const SUBCASE_TYPES = {
   DEFINITIEVE_GOEDKEURING: 'http://themis.vlaanderen.be/id/concept/procedurestap-type/6f7d1086-7c02-4a80-8c60-5690894f70fc',
+  PRINCIPIELE_GOEDKEURING: 'http://themis.vlaanderen.be/id/concept/procedurestap-type/7b90b3a6-2787-4b41-8a1d-886fc5abbb33',
   BEKRACHTIGING_VLAAMSE_REGERING: 'http://themis.vlaanderen.be/id/concept/procedurestap-type/bdba2bbc-7af6-490b-98a8-433955cfe869',
 };
 
@@ -48,6 +49,67 @@ const PARLIAMENT_FLOW_STATUSES = {
   BEING_HANDLED: 'http://themis.vlaanderen.be/id/parlementaireaangelegenheid-status/3905d9a1-c841-42fc-8a89-3b7d4ad61b4b',
 };
 
+/** These requirements are used to check for the existence of a documentType
+ * on the current agendaitem, and then loop over the pieces & subcases to see
+ * which pieces and files are required.
+ */
+const DOCUMENT_REQUIREMENTS = [
+  {
+    documentType: DOCUMENT_TYPES.DECREET,
+    requirements: [
+      {
+        subcaseType: SUBCASE_TYPES.DEFINITIEVE_GOEDKEURING,
+        requiredPieces: [
+          {
+            pieceType: DOCUMENT_TYPES.BESLISSINGSFICHE,
+            fileTypes: ['isPdf', 'isSigned']
+          },
+          {
+            pieceType: DOCUMENT_TYPES.DECREET,
+            fileTypes: ['isWord', 'isPdf', 'isSigned']
+          },
+          {
+            pieceType: DOCUMENT_TYPES.MEMORIE,
+            fileTypes: ['isWord', 'isPdf', 'isSigned']
+          },
+          {
+            pieceType: DOCUMENT_TYPES.NOTA,
+            fileTypes: ['isPdf']
+          },
+          {
+            pieceType: DOCUMENT_TYPES.ADVIES,
+            fileTypes: ['isPdf']
+          }
+        ]
+      },
+      {
+        subcaseType: SUBCASE_TYPES.PRINCIPIELE_GOEDKEURING,
+        requiredPieces: [
+          {
+            pieceType: DOCUMENT_TYPES.BESLISSINGSFICHE,
+            fileTypes: ['isPdf', 'isSigned']
+          },
+          {
+            pieceType: DOCUMENT_TYPES.DECREET,
+            fileTypes: ['isWord', 'isPdf']
+          },
+          {
+            pieceType: DOCUMENT_TYPES.MEMORIE,
+            fileTypes: ['isWord', 'isPdf']
+          },
+          {
+            pieceType: DOCUMENT_TYPES.NOTA,
+            fileTypes: ['isPdf']
+          },
+          {
+            pieceType: DOCUMENT_TYPES.ADVIES,
+            fileTypes: ['isPdf']
+          }
+        ]
+      }
+    ]
+  }
+];
 export {
   DOMAIN,
   VP_API_CLIENT_ID,
@@ -59,5 +121,6 @@ export {
   PARLIAMENT_FLOW_STATUSES,
   ENABLE_DEBUG_FILE_WRITING,
   ENABLE_SENDING_TO_VP_API,
-  ENABLE_ALWAYS_CREATE_PARLIAMENT_FLOW
+  ENABLE_ALWAYS_CREATE_PARLIAMENT_FLOW,
+  DOCUMENT_REQUIREMENTS
 };
