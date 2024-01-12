@@ -168,7 +168,7 @@ app.post('/', async function (req, res, next) {
         "MOCKED": true,
         "status": "SUCCESS",
         "id": decisionmakingFlowUri,
-        "pobj": "" + Math.floor(100 + Math.random() * 900), // random 3-digit pobj
+        "pobj": "" + Math.floor(10 + Math.random() * 90), // random 3-digit pobj
         files: allFiles
       }
       if (ENABLE_DEBUG_FILE_WRITING) {
