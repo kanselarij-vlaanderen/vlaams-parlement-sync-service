@@ -27,7 +27,7 @@ import {
 import { syncFlowsByStatus } from './lib/sync';
 
 /** Schedule report generation cron job */
-const cronPattern = process.env.POLLING_CRON_PATTERN || '*/30 * * * * *';
+const cronPattern = process.env.POLLING_CRON_PATTERN || '* */5 6-20 * * 1-5';
 CronJob.from({
   cronTime: cronPattern,
   onTick: (async () => {
@@ -82,6 +82,7 @@ app.get('/pieces-ready-to-be-sent', async function (req, res, next) {
 
 app.post('/debug-resync-error-flows', async function (req, res, next) {
   await syncFlowsByStatus([PARLIAMENT_FLOW_STATUSES.VP_ERROR]);
+  return res.status(204).send();
 })
 
 app.post('/', async function (req, res, next) {
