@@ -3,8 +3,7 @@ import fs from 'fs';
 import bodyParser from 'body-parser';
 import VP from './lib/vp';
 import { fetchCurrentUser } from "./lib/utils";
-import { getAgendaitem,
-  getPieceUris,
+import { getPieceUris,
   isAgendaItemReadyForVP,
   getMissingPieces,
   getDecisionmakingFlowForAgendaitem
@@ -160,7 +159,7 @@ app.post('/', async function (req, res, next) {
         for (const file of piece.files) {
           allFiles.push({
             "id": file.uri,
-            "pfls": "" + Math.floor(100 + Math.random() * 900), // random 4-digit pobj
+            "pfls": "" + Math.floor(1000 + Math.random() * 9000), // random 4-digit pobj
           });
         }
       }
@@ -168,7 +167,7 @@ app.post('/', async function (req, res, next) {
         "MOCKED": true,
         "status": "SUCCESS",
         "id": decisionmakingFlowUri,
-        "pobj": "" + Math.floor(10 + Math.random() * 90), // random 3-digit pobj
+        "pobj": "" + Math.floor(100 + Math.random() * 900), // random 3-digit pobj
         files: allFiles
       }
       if (ENABLE_DEBUG_FILE_WRITING) {
