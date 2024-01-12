@@ -25,15 +25,16 @@ import {
 import { syncFlowsByStatus } from './lib/sync';
 
 /** Schedule report generation cron job */
-const cronPattern = process.env.POLLING_CRON_PATTERN || '* */5 6-20 * * 1-5';
-CronJob.from({
-  cronTime: cronPattern,
-  onTick: (async () => {
+const cronPattern = process.env.POLLING_CRON_PATTERN || '0 */5 6-20 * * 1-5';
+const cronJob = new CronJob(
+	cronPattern,
+	function () {
     const { COMPLETE, INCOMPLETE } = PARLIAMENT_FLOW_STATUSES;
-    await syncFlowsByStatus([COMPLETE, INCOMPLETE]);
-  }),
-  start: true,
-});
+    syncFlowsByStatus([COMPLETE, INCOMPLETE]);
+	}, // onTick
+	null, // onComplete
+	true, // start
+);
 
 const cacheClearTimeout = process.env.CACHE_CLEAR_TIMEOUT || 3000;
 
