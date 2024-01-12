@@ -59,13 +59,14 @@ app.get('/pieces-ready-to-be-sent', async function (req, res, next) {
 
 app.post('/', async function (req, res, next) {
   console.log("Sending dossier...");
+  console.log(req.body);
 
-  const agendaitemUri = req.query.agendaitem;
+  const agendaitemUri = req.body.agendaitem;
   if (!agendaitemUri) {
     return next({ message: 'Query parameter "agendaitem" must be passed in', status: 400 });
   }
 
-  const piecesUris = req.query.pieces?.split(',');
+  const piecesUris = req.body.pieces;
   if (!piecesUris) {
     return next({ message: 'Query parameter "pieces" must be passed in', status: 400 });
   }
@@ -74,8 +75,8 @@ app.post('/', async function (req, res, next) {
     return next({ message: 'At least one piece must be sent to VP', status: 400 });
   }
 
-  const comment = req.query.comment;
-  const isComplete = req.query.isComplete === 'true';
+  const comment = req.body.comment;
+  const isComplete = req.body.isComplete === 'true';
 
   const currentUser = await fetchCurrentUser(req.headers["mu-session-id"]);
   if (!currentUser) {
