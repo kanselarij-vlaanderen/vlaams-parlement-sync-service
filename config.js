@@ -5,6 +5,7 @@ function isTruthy(value) {
 const DOMAIN = process.env.VP_API_DOMAIN;
 const VP_API_CLIENT_ID = process.env.VP_API_CLIENT_ID;
 const VP_API_CLIENT_SECRET = process.env.VP_API_CLIENT_SECRET;
+const VP_GRAPH_URI = "http://mu.semte.ch/graphs/system/parliament";
 
 if ([DOMAIN, VP_API_CLIENT_ID, VP_API_CLIENT_SECRET].some((envVar) => !envVar)) {
   console.warn(
@@ -47,6 +48,7 @@ const PARLIAMENT_FLOW_STATUSES = {
   INCOMPLETE: 'http://themis.vlaanderen.be/id/parlementaireaangelegenheid-status/d30fdd4d-ba47-437d-b72e-4bff02e8c3fb',
   COMPLETE: 'http://themis.vlaanderen.be/id/parlementaireaangelegenheid-status/018fb31c-44ad-4bf5-b01b-76de2d48abf4',
   BEING_HANDLED: 'http://themis.vlaanderen.be/id/parlementaireaangelegenheid-status/3905d9a1-c841-42fc-8a89-3b7d4ad61b4b',
+  VP_ERROR: 'http://themis.vlaanderen.be/id/parlementaireaangelegenheid-status/3d03c20e-0170-43f5-840e-a541d1fd22bd',
 };
 
 /** These requirements are used to check for the existence of a documentType
@@ -110,6 +112,13 @@ const DOCUMENT_REQUIREMENTS = [
     ]
   }
 ];
+
+const VP_PARLIAMENT_FLOW_STATUSES = {
+  BEING_HANDLED: "te behandelen in commissie"
+}
+
+const VP_ERROR_EXPIRE_TIME = 60;
+
 export {
   DOMAIN,
   VP_API_CLIENT_ID,
@@ -119,8 +128,11 @@ export {
   DECISION_RESULT_CODES,
   ACCESS_LEVELS,
   PARLIAMENT_FLOW_STATUSES,
+  VP_PARLIAMENT_FLOW_STATUSES,
   ENABLE_DEBUG_FILE_WRITING,
   ENABLE_SENDING_TO_VP_API,
   ENABLE_ALWAYS_CREATE_PARLIAMENT_FLOW,
-  DOCUMENT_REQUIREMENTS
+  DOCUMENT_REQUIREMENTS,
+  VP_GRAPH_URI,
+  VP_ERROR_EXPIRE_TIME
 };

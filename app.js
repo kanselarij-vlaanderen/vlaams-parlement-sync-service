@@ -1,6 +1,7 @@
 import { app, errorHandler } from 'mu';
 import fs from 'fs';
 import bodyParser from 'body-parser';
+import { CronJob } from 'cron';
 import VP from './lib/vp';
 import { fetchCurrentUser } from "./lib/utils";
 import { getPieceUris,
@@ -10,12 +11,30 @@ import { getPieceUris,
 } from './lib/agendaitem';
 import { getPieceMetadata } from './lib/piece';
 import { getDecisionmakingFlow } from './lib/decisionmaking-flow';
-import { ENABLE_DEBUG_FILE_WRITING, ENABLE_SENDING_TO_VP_API, ENABLE_ALWAYS_CREATE_PARLIAMENT_FLOW, PARLIAMENT_FLOW_STATUSES } from './config';
+import {
+  ENABLE_DEBUG_FILE_WRITING,
+  ENABLE_SENDING_TO_VP_API,
+  ENABLE_ALWAYS_CREATE_PARLIAMENT_FLOW,
+  PARLIAMENT_FLOW_STATUSES
+} from './config';
 
 import {
   createOrUpdateParliamentFlow,
   enrichPiecesWithPreviousSubmissions
 } from "./lib/parliament-flow";
+import { syncFlowsByStatus } from './lib/sync';
+
+/** Schedule report generation cron job */
+const cronPattern = process.env.POLLING_CRON_PATTERN || '0 */5 6-20 * * 1-5';
+const cronJob = new CronJob(
+	cronPattern,
+	function () {
+    const { COMPLETE, INCOMPLETE } = PARLIAMENT_FLOW_STATUSES;
+    syncFlowsByStatus([COMPLETE, INCOMPLETE]);
+	}, // onTick
+	null, // onComplete
+	true, // start
+);
 
 const cacheClearTimeout = process.env.CACHE_CLEAR_TIMEOUT || 3000;
 
@@ -56,6 +75,11 @@ app.get('/pieces-ready-to-be-sent', async function (req, res, next) {
     }
   });
 });
+
+app.post('/debug-resync-error-flows', async function (req, res, next) {
+  await syncFlowsByStatus([PARLIAMENT_FLOW_STATUSES.VP_ERROR]);
+  return res.status(204).send();
+})
 
 app.post('/', async function (req, res, next) {
   console.log("Sending dossier...");
