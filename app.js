@@ -9,7 +9,7 @@ import { getPieceUris,
   getMissingPieces,
   getDecisionmakingFlowForAgendaitem
 } from './lib/agendaitem';
-import { getPieceMetadata } from './lib/piece';
+import { getPieceMetadata, getSubmittedPieces } from './lib/piece';
 import { getDecisionmakingFlow } from './lib/decisionmaking-flow';
 import {
   ENABLE_DEBUG_FILE_WRITING,
@@ -63,15 +63,16 @@ app.get('/pieces-ready-to-be-sent', async function (req, res, next) {
   }
 
   const piecesUris = await getPieceUris(uri);
+  const submitted = await getSubmittedPieces(piecesUris);
   if (piecesUris.length > 0) {
     const ready = await getPieceMetadata(piecesUris);
-    const missing = await getMissingPieces(uri, ready);
+    const missing = await getMissingPieces(uri, [...ready, ...submitted]);
 
     return res.status(200).send({ data: { ready, missing } });
   }
   return res.status(200).send({ data: {
       ready: [],
-      missing: {}
+      missing: await getMissingPieces(uri, [...submitted])
     }
   });
 });
@@ -100,7 +101,7 @@ app.post('/', async function (req, res, next) {
   }
 
   const comment = req.body.comment;
-  const isComplete = req.body.isComplete === 'true';
+  const isComplete = req.body.isComplete;
 
   const currentUser = await fetchCurrentUser(req.headers["mu-session-id"]);
   if (!currentUser) {
