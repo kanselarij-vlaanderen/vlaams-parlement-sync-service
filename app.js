@@ -25,7 +25,7 @@ import {
 import { syncFlowsByStatus } from './lib/sync';
 
 /** Schedule report generation cron job */
-const cronPattern = process.env.POLLING_CRON_PATTERN || '0 */5 6-20 * * 1-5';
+const cronPattern = process.env.POLLING_CRON_PATTERN || '0 0 7 * * *';
 const cronJob = new CronJob(
 	cronPattern,
 	function () {
