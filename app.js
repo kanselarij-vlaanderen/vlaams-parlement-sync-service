@@ -11,7 +11,7 @@ import { getPieceMetadata, getSubmittedPieces } from './lib/piece';
 import { PARLIAMENT_FLOW_STATUSES } from './config';
 
 import { syncFlowsByStatus } from "./lib/sync";
-import { JobManager, createJob, getJob } from "./lib/jobs";
+import { JobManager, cleanupOngoingJobs, createJob, getJob } from "./lib/jobs";
 
 /** Schedule report generation cron job */
 const cronPattern = process.env.POLLING_CRON_PATTERN || '0 0 7 * * *';
@@ -24,6 +24,8 @@ const cronJob = new CronJob(
 	null, // onComplete
 	true, // start
 );
+
+cleanupOngoingJobs();
 
 const jobManager = new JobManager();
 jobManager.run();
