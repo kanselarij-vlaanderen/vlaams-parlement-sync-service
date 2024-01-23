@@ -11,7 +11,7 @@ import { getPieceMetadata, getSubmittedPieces } from './lib/piece';
 import { PARLIAMENT_FLOW_STATUSES } from './config';
 
 import { syncFlowsByStatus } from "./lib/sync";
-import { JobManager, createJob } from "./lib/jobs";
+import { JobManager, createJob, getJob } from "./lib/jobs";
 
 /** Schedule report generation cron job */
 const cronPattern = process.env.POLLING_CRON_PATTERN || '0 0 7 * * *';
@@ -106,7 +106,15 @@ app.post('/', async function (req, res, next) {
     return next({ message: 'Could not find user for session', status: 404 });
   }
 
-  await createJob(agendaitemUri, piecesUris, comment, currentUser, isComplete);
+  const job = await createJob(
+    agendaitemUri,
+    piecesUris,
+    comment,
+    currentUser,
+    isComplete
+  );
+  jobManager.run();
+  return res.status(201).send(job);
 });
 
 app.get("/send-to-vp-jobs/:uuid", async function (req, res) {
@@ -117,10 +125,7 @@ app.get("/send-to-vp-jobs/:uuid", async function (req, res) {
         type: "send-to-vp-job",
         id: job.id,
         attributes: {
-          uri: job.uri,
-          meeting: job.meeting,
-          status: job.status,
-          created: job.created,
+          ...job
         },
       },
     });
