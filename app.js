@@ -132,8 +132,12 @@ app.post('/', async function (req, res, next) {
   }
 
   let payload;
+  let contact = {
+    name: `${currentUser.firstName} ${currentUser.familyName}`,
+    email: currentUser.mbox? currentUser.mbox : ''
+  };
   try {
-    payload = VP.generatePayload(decisionmakingFlow, pieces, comment);
+    payload = VP.generatePayload(decisionmakingFlow, pieces, comment, contact);
   } catch (error) {
     return next({
       message: `An error occurred while creating the payload: "${error.message}"`,
@@ -159,7 +163,7 @@ app.post('/', async function (req, res, next) {
       if (ENABLE_DEBUG_FILE_WRITING) {
         fs.writeFileSync('/debug/response.json', JSON.stringify(responseJson, null, 2));
       }
-      await createOrUpdateParliamentFlow(responseJson, decisionmakingFlowUri, pieces, currentUser, comment, isComplete);
+      await createOrUpdateParliamentFlow(responseJson, decisionmakingFlowUri, pieces, currentUser.user, comment, isComplete);
 
       return setTimeout(() => {
         res.status(200).send()
@@ -199,7 +203,7 @@ app.post('/', async function (req, res, next) {
       if (ENABLE_DEBUG_FILE_WRITING) {
         fs.writeFileSync('/debug/response.json', JSON.stringify(mockResponseJson, null, 2));
       }
-      await createOrUpdateParliamentFlow(mockResponseJson, decisionmakingFlowUri, pieces, currentUser, comment, isComplete);
+      await createOrUpdateParliamentFlow(mockResponseJson, decisionmakingFlowUri, pieces, currentUser.user, comment, isComplete);
     }
     return setTimeout(() => {
       return res.status(204).end();
