@@ -93,11 +93,11 @@ const DOCUMENT_REQUIREMENTS = [
           },
           {
             pieceType: DOCUMENT_TYPES.DECREET,
-            fileTypes: ['isWord', 'isPdf']
+            fileTypes: ['isPdf']
           },
           {
             pieceType: DOCUMENT_TYPES.MEMORIE,
-            fileTypes: ['isWord', 'isPdf']
+            fileTypes: ['isPdf']
           },
           {
             pieceType: DOCUMENT_TYPES.NOTA,
