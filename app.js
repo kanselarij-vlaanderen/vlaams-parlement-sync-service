@@ -134,7 +134,7 @@ app.post('/', async function (req, res, next) {
   let payload;
   let contact = {
     name: `${currentUser.firstName} ${currentUser.familyName}`,
-    email: currentUser.mbox? currentUser.mbox : ''
+    email: currentUser.mbox? currentUser.mbox.replace('mailto:', '') : ''
   };
   try {
     payload = VP.generatePayload(decisionmakingFlow, pieces, comment, contact);
