@@ -40,6 +40,26 @@ const cacheClearTimeout = process.env.CACHE_CLEAR_TIMEOUT || 3000;
 
 app.use(bodyParser.json());
 
+/* Route to verify the credentials for getting an access token */
+app.get('/verify-credentials/', async function (req, res, next) {
+  try {
+    const accessToken = await VP.getAccessToken();
+    if (accessToken) {
+      try {
+        const ping = await VP.ping();
+        console.log(ping);
+        return res.send({ message: 'Credentials valid. Access token was successfully retrieved and service is reachable.'});
+      } catch (e) {
+        return res.send({ error: 'Error while pinging VP-API: ' + JSON.stringify(e) });
+      }
+    } else {
+      return res.send({ message: 'Credentials invalid! Access token could not be retrieved.'});
+    }
+  } catch (e) {
+    return res.send({ error: 'Error while retrieving access token: ' + JSON.stringify(e) });
+  }
+});
+
 app.get('/is-ready-for-vp/', async function (req, res, next) {
   const uri = req.query.uri;
   if (!uri) {
