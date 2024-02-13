@@ -22,16 +22,13 @@ import {
   createOrUpdateParliamentFlow,
   enrichPiecesWithPreviousSubmissions
 } from "./lib/parliament-flow";
-import { syncFlowsByStatus } from './lib/sync';
+import { syncFlowsByStatus, syncSubmittedFlows } from './lib/sync';
 
 /** Schedule report generation cron job */
 const cronPattern = process.env.POLLING_CRON_PATTERN || '0 0 7 * * *';
 const cronJob = new CronJob(
 	cronPattern,
-	function () {
-    const { COMPLETE, INCOMPLETE } = PARLIAMENT_FLOW_STATUSES;
-    syncFlowsByStatus([COMPLETE, INCOMPLETE]);
-	}, // onTick
+	syncSubmittedFlows, // onTick
 	null, // onComplete
 	true, // start
 );
@@ -99,6 +96,11 @@ app.get('/pieces-ready-to-be-sent', async function (req, res, next) {
 
 app.post('/debug-resync-error-flows', async function (req, res, next) {
   await syncFlowsByStatus([PARLIAMENT_FLOW_STATUSES.VP_ERROR]);
+  return res.status(204).send();
+});
+
+app.post('/debug-resync-submitted-to-parliament', async function (req, res, next) {
+  await syncSubmittedFlows();
   return res.status(204).send();
 })
 
