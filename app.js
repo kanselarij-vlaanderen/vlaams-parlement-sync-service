@@ -23,6 +23,7 @@ import {
   enrichPiecesWithPreviousSubmissions
 } from "./lib/parliament-flow";
 import { syncFlowsByStatus } from './lib/sync';
+import { getSubmitterForSubcase } from './lib/subcase';
 
 /** Schedule report generation cron job */
 const cronPattern = process.env.POLLING_CRON_PATTERN || '0 0 7 * * *';
@@ -129,11 +130,14 @@ app.post('/', async function (req, res, next) {
   }
   // Set default URI for debugging purposes.
   // Default URI points to https://kaleidos-test.vlaanderen.be/dossiers/6398392DC2B90D4571CF86EA/deeldossiers
-  const decisionmakingFlowUri = await getDecisionmakingFlowForAgendaitem(agendaitemUri) ?? 'http://themis.vlaanderen.be/id/besluitvormingsaangelegenheid/6398392DC2B90D4571CF86EA';
+  const decisionmakingFlowUri =
+    (await getDecisionmakingFlowForAgendaitem(agendaitemUri)) ??
+    "http://themis.vlaanderen.be/id/besluitvormingsaangelegenheid/6398392DC2B90D4571CF86EA";
 
   const decisionmakingFlow = await getDecisionmakingFlow(decisionmakingFlowUri);
 
   const latestSubcase = await getLatestSubcase(decisionmakingFlowUri);
+  const submitter = await getSubmitterForSubcase(latestSubcase.uri);
 
   if (!decisionmakingFlow) {
     return next({ message: 'Could not find decisionmaking flow', status: 404 });
@@ -164,7 +168,8 @@ app.post('/', async function (req, res, next) {
       pieces,
       comment,
       contact,
-      latestSubcase.title
+      latestSubcase.title,
+      submitter
     );
   } catch (error) {
     return next({
