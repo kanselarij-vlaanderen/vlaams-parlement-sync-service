@@ -10,7 +10,7 @@ import { getPieceUris,
   getDecisionmakingFlowForAgendaitem
 } from './lib/agendaitem';
 import { getPieceMetadata, getSubmittedPieces } from './lib/piece';
-import { getDecisionmakingFlow } from './lib/decisionmaking-flow';
+import { getDecisionmakingFlow, getLatestSubcase } from './lib/decisionmaking-flow';
 import {
   ENABLE_DEBUG_FILE_WRITING,
   ENABLE_SENDING_TO_VP_API,
@@ -133,6 +133,8 @@ app.post('/', async function (req, res, next) {
 
   const decisionmakingFlow = await getDecisionmakingFlow(decisionmakingFlowUri);
 
+  const latestSubcase = await getLatestSubcase(decisionmakingFlowUri);
+
   if (!decisionmakingFlow) {
     return next({ message: 'Could not find decisionmaking flow', status: 404 });
   }
@@ -157,7 +159,13 @@ app.post('/', async function (req, res, next) {
     email: currentUser.mbox? currentUser.mbox.replace('mailto:', '') : ''
   };
   try {
-    payload = VP.generatePayload(decisionmakingFlow, pieces, comment, contact);
+    payload = VP.generatePayload(
+      decisionmakingFlow,
+      pieces,
+      comment,
+      contact,
+      latestSubcase.title
+    );
   } catch (error) {
     return next({
       message: `An error occurred while creating the payload: "${error.message}"`,
