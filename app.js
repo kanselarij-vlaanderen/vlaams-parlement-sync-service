@@ -136,12 +136,17 @@ app.post('/', async function (req, res, next) {
 
   const decisionmakingFlow = await getDecisionmakingFlow(decisionmakingFlowUri);
 
-  const latestSubcase = await getLatestSubcase(decisionmakingFlowUri);
-  const submitter = await getSubmitterForSubcase(latestSubcase.uri);
-
   if (!decisionmakingFlow) {
     return next({ message: 'Could not find decisionmaking flow', status: 404 });
   }
+
+  const latestSubcase = await getLatestSubcase(decisionmakingFlowUri);
+
+  if (!latestSubcase) {
+    return next({ message: 'Could not find a subcase for decisionmaking flow', status: 404 });
+  }
+
+  const submitter = await getSubmitterForSubcase(latestSubcase.uri);
 
   let pieces = await getPieceMetadata(piecesUris);
 
@@ -168,7 +173,7 @@ app.post('/', async function (req, res, next) {
       pieces,
       comment,
       contact,
-      latestSubcase.title,
+      latestSubcase,
       submitter
     );
   } catch (error) {
