@@ -23,6 +23,7 @@ import {
   enrichPiecesWithPreviousSubmissions
 } from "./lib/parliament-flow";
 import { syncFlowsByStatus } from './lib/sync';
+import { getSubmitterForSubcase } from './lib/subcase';
 
 /** Schedule report generation cron job */
 const cronPattern = process.env.POLLING_CRON_PATTERN || '0 0 7 * * *';
@@ -129,7 +130,9 @@ app.post('/', async function (req, res, next) {
   }
   // Set default URI for debugging purposes.
   // Default URI points to https://kaleidos-test.vlaanderen.be/dossiers/6398392DC2B90D4571CF86EA/deeldossiers
-  const decisionmakingFlowUri = await getDecisionmakingFlowForAgendaitem(agendaitemUri) ?? 'http://themis.vlaanderen.be/id/besluitvormingsaangelegenheid/6398392DC2B90D4571CF86EA';
+  const decisionmakingFlowUri =
+    (await getDecisionmakingFlowForAgendaitem(agendaitemUri)) ??
+    "http://themis.vlaanderen.be/id/besluitvormingsaangelegenheid/6398392DC2B90D4571CF86EA";
 
   const decisionmakingFlow = await getDecisionmakingFlow(decisionmakingFlowUri);
 
@@ -142,6 +145,8 @@ app.post('/', async function (req, res, next) {
   if (!latestSubcase) {
     return next({ message: 'Could not find a subcase for decisionmaking flow', status: 404 });
   }
+
+  const submitter = await getSubmitterForSubcase(latestSubcase.uri);
 
   let pieces = await getPieceMetadata(piecesUris);
 
@@ -168,7 +173,8 @@ app.post('/', async function (req, res, next) {
       pieces,
       comment,
       contact,
-      latestSubcase
+      latestSubcase,
+      submitter
     );
   } catch (error) {
     return next({
