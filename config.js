@@ -65,15 +65,15 @@ const DOCUMENT_REQUIREMENTS = [
         requiredPieces: [
           {
             pieceType: DOCUMENT_TYPES.BESLISSINGSFICHE,
-            fileTypes: ['isPdf', 'isSigned']
+            fileTypes: ['isSigned']
           },
           {
             pieceType: DOCUMENT_TYPES.DECREET,
-            fileTypes: ['isWord', 'isPdf', 'isSigned']
+            fileTypes: ['isWord', 'isSigned']
           },
           {
             pieceType: DOCUMENT_TYPES.MEMORIE,
-            fileTypes: ['isWord', 'isPdf', 'isSigned']
+            fileTypes: ['isWord', 'isSigned']
           },
           {
             pieceType: DOCUMENT_TYPES.NOTA,
@@ -90,7 +90,7 @@ const DOCUMENT_REQUIREMENTS = [
         requiredPieces: [
           {
             pieceType: DOCUMENT_TYPES.BESLISSINGSFICHE,
-            fileTypes: ['isPdf', 'isSigned']
+            fileTypes: ['isSigned']
           },
           {
             pieceType: DOCUMENT_TYPES.DECREET,
