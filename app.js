@@ -9,7 +9,11 @@ import { getPieceUris,
   getMissingPieces,
   getDecisionmakingFlowForAgendaitem
 } from './lib/agendaitem';
-import { getPieceMetadata, getSubmittedPieces } from './lib/piece';
+import {
+  getPieceMetadata,
+  getSubmittedPieces,
+  filterRedundantFiles
+} from './lib/piece';
 import { getDecisionmakingFlow, getLatestSubcase } from './lib/decisionmaking-flow';
 import {
   ENABLE_DEBUG_FILE_WRITING,
@@ -86,7 +90,8 @@ app.get('/pieces-ready-to-be-sent', async function (req, res, next) {
   const piecesUris = await getPieceUris(uri);
   const submitted = await getSubmittedPieces(piecesUris);
   if (piecesUris.length > 0) {
-    const ready = await getPieceMetadata(piecesUris);
+    const pieces = await getPieceMetadata(piecesUris);
+    const ready = filterRedundantFiles(pieces);
     const missing = await getMissingPieces(uri, [...ready, ...submitted]);
 
     return res.status(200).send({ data: { ready, missing } });
@@ -148,6 +153,8 @@ app.post('/', async function (req, res, next) {
   if (pieces.length === 0) {
     return next({ message: 'Could not find any files to send for decisionmaking flow', status: 404 });
   }
+
+  pieces = filterRedundantFiles(pieces);
 
   if (decisionmakingFlow.parliamentFlow) {
     pieces = await enrichPiecesWithPreviousSubmissions(decisionmakingFlow.parliamentFlow, pieces);
