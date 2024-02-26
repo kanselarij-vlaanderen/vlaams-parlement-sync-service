@@ -91,7 +91,7 @@ app.get('/pieces-ready-to-be-sent', async function (req, res, next) {
   const submitted = await getSubmittedPieces(piecesUris);
   if (piecesUris.length > 0) {
     const pieces = await getPieceMetadata(piecesUris);
-    const ready = filterRedundantFiles(pieces);
+    const ready = filterRedundantFiles(pieces, submitted);
     const missing = await getMissingPieces(uri, [...ready, ...submitted]);
 
     return res.status(200).send({ data: { ready, missing } });
@@ -159,7 +159,8 @@ app.post('/', async function (req, res, next) {
     return next({ message: 'Could not find any files to send for decisionmaking flow', status: 404 });
   }
 
-  pieces = filterRedundantFiles(pieces);
+  const submitted = await getSubmittedPieces(piecesUris);
+  pieces = filterRedundantFiles(pieces, submitted);
 
   if (decisionmakingFlow.parliamentFlow) {
     pieces = await enrichPiecesWithPreviousSubmissions(decisionmakingFlow.parliamentFlow, pieces);
