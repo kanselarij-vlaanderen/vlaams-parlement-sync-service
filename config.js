@@ -29,6 +29,7 @@ const DOCUMENT_TYPES = {
   ADVIES: 'http://themis.vlaanderen.be/id/concept/document-type/fb931eff-38f2-4743-802b-4240c35b8b0c',
   ADVIES_IF: 'http://themis.vlaanderen.be/id/concept/document-type/351ba62d-eeff-4b08-b1e3-0a56d38116c4',
   BIJLAGE: 'http://themis.vlaanderen.be/id/concept/document-type/b3e150d3-eac6-44cf-9e70-dd4d13423631',
+  BEGROTINGSAKKOORD: 'http://themis.vlaanderen.be/id/concept/document-type/6870daa2-d80a-4483-a78f-53cbd6b85af2',
 };
 
 const SUBCASE_TYPES = {
