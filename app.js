@@ -22,15 +22,21 @@ import {
   createOrUpdateParliamentFlow,
   enrichPiecesWithPreviousSubmissions
 } from "./lib/parliament-flow";
-import { syncFlowsByStatus, syncSubmittedFlows } from './lib/sync';
+import { syncFlowsByStatus, syncIncomingFlows, syncSubmittedFlows } from './lib/sync';
 
-/** Schedule report generation cron job */
+/** Schedule VP flows sync cron job */
 const cronPattern = process.env.POLLING_CRON_PATTERN || '0 0 7 * * *';
-const cronJob = new CronJob(
+new CronJob(
 	cronPattern,
 	syncSubmittedFlows, // onTick
 	null, // onComplete
-	true, // start
+	false, // start
+);
+new CronJob(
+	cronPattern,
+	syncIncomingFlows, // onTick
+	null, // onComplete
+	false, // start
 );
 
 const cacheClearTimeout = process.env.CACHE_CLEAR_TIMEOUT || 3000;
@@ -101,6 +107,12 @@ app.post('/debug-resync-error-flows', async function (req, res, next) {
 
 app.post('/debug-resync-submitted-to-parliament', async function (req, res, next) {
   await syncSubmittedFlows();
+  return res.status(204).send();
+})
+
+console.log("Current directory:", process.cwd());
+app.post('/debug-resync-incoming-flows', async function (req, res, next) {
+  await syncIncomingFlows();
   return res.status(204).send();
 })
 

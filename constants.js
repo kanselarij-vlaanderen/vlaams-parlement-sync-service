@@ -1,5 +1,7 @@
 import { sparqlEscapeUri } from "mu";
 
+const RESOURCE_BASE = "http://themis.vlaanderen.be/id/";
+
 const prefixes = {
   adms: "http://www.w3.org/ns/adms#",
   besluitvorming: "https://data.vlaanderen.be/ns/besluitvorming#",
@@ -10,6 +12,7 @@ const prefixes = {
   mu: "http://mu.semte.ch/vocabularies/core/",
   nfo: "http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#",
   nie: "http://www.semanticdesktop.org/ontologies/2007/01/19/nie#",
+  nmo: "http://www.semanticdesktop.org/ontologies/2007/03/22/nmo#",
   parl: "http://mu.semte.ch/vocabularies/ext/parlement/",
   pav: "http://purl.org/pav/",
   prov: "http://www.w3.org/ns/prov#",
@@ -25,4 +28,4 @@ const prefixHeaderLines = Object.fromEntries(
   ])
 );
 
-export { prefixHeaderLines };
+export { prefixHeaderLines, RESOURCE_BASE };
