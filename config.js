@@ -6,6 +6,8 @@ const DOMAIN = process.env.VP_API_DOMAIN;
 const VP_API_CLIENT_ID = process.env.VP_API_CLIENT_ID;
 const VP_API_CLIENT_SECRET = process.env.VP_API_CLIENT_SECRET;
 const VP_GRAPH_URI = "http://mu.semte.ch/graphs/system/parliament";
+const KANSELARIJ_GRAPH_URI = "http://mu.semte.ch/graphs/organizations/kanselarij";
+const PUBLIC_GRAPH_URI = "http://mu.semte.ch/graphs/public";
 
 if ([DOMAIN, VP_API_CLIENT_ID, VP_API_CLIENT_SECRET].some((envVar) => !envVar)) {
   console.warn(
@@ -126,6 +128,20 @@ const VP_PARLIAMENT_FLOW_STATUSES = {
 
 const VP_ERROR_EXPIRE_TIME = 60;
 
+const JOB = {
+  STATUSES: {
+    SCHEDULED: "http://redpencil.data.gift/id/concept/JobStatus/scheduled",
+    BUSY: "http://redpencil.data.gift/id/concept/JobStatus/busy",
+    SUCCESS: "http://redpencil.data.gift/id/concept/JobStatus/success",
+    FAILED: "http://redpencil.data.gift/id/concept/JobStatus/failed",
+  },
+  GRAPH: VP_GRAPH_URI,
+  RESOURCE_BASE_URI:
+    "http://mu.semte.ch/services/vlaams-parlement-sync/send-to-parliament-job/",
+  CONTEXT_RESOURCE_BASE_URI:
+    "http://mu.semte.ch/services/vlaams-parlement-sync/send-to-parliament-job-context/",
+};
+
 export {
   DOMAIN,
   VP_API_CLIENT_ID,
@@ -141,5 +157,8 @@ export {
   ENABLE_ALWAYS_CREATE_PARLIAMENT_FLOW,
   DOCUMENT_REQUIREMENTS,
   VP_GRAPH_URI,
-  VP_ERROR_EXPIRE_TIME
+  VP_ERROR_EXPIRE_TIME,
+  KANSELARIJ_GRAPH_URI,
+  PUBLIC_GRAPH_URI,
+  JOB,
 };
