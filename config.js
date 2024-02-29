@@ -36,6 +36,7 @@ const DOCUMENT_TYPES = {
   MOTIE: 'http://themis.vlaanderen.be/id/concept/document-type/7b8cc610-2bcd-4eab-afa2-8cd7adbd4d4f',
   RESOLUTIE: 'http://themis.vlaanderen.be/id/concept/document-type/2fef8c6a-ca60-4cd5-97b3-578144aece0a',
   VERWIJZINGSFICHE: 'http://themis.vlaanderen.be/id/concept/document-type/205bb487-127c-43c6-9a8a-9b397a99f056',
+  BIJLAGE: 'http://themis.vlaanderen.be/id/concept/document-type/b3e150d3-eac6-44cf-9e70-dd4d13423631',
 };
 
 const SUBCASE_TYPES = {
