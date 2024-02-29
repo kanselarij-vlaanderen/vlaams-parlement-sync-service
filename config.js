@@ -29,6 +29,9 @@ const DOCUMENT_TYPES = {
   MEMORIE: 'http://themis.vlaanderen.be/id/concept/document-type/f036e016-268e-4611-8fee-77d2047b51d8',
   NOTA: 'http://themis.vlaanderen.be/id/concept/document-type/f2b0f655-8ed7-4f61-8f2b-ca813de7a6ed',
   ADVIES: 'http://themis.vlaanderen.be/id/concept/document-type/fb931eff-38f2-4743-802b-4240c35b8b0c',
+  ADVIES_IF: 'http://themis.vlaanderen.be/id/concept/document-type/351ba62d-eeff-4b08-b1e3-0a56d38116c4',
+  BIJLAGE: 'http://themis.vlaanderen.be/id/concept/document-type/b3e150d3-eac6-44cf-9e70-dd4d13423631',
+  BEGROTINGSAKKOORD: 'http://themis.vlaanderen.be/id/concept/document-type/6870daa2-d80a-4483-a78f-53cbd6b85af2',
 };
 
 const SUBCASE_TYPES = {
@@ -66,15 +69,15 @@ const DOCUMENT_REQUIREMENTS = [
         requiredPieces: [
           {
             pieceType: DOCUMENT_TYPES.BESLISSINGSFICHE,
-            fileTypes: ['isPdf', 'isSigned']
+            fileTypes: ['isSigned']
           },
           {
             pieceType: DOCUMENT_TYPES.DECREET,
-            fileTypes: ['isWord', 'isPdf', 'isSigned']
+            fileTypes: ['isWord', 'isSigned']
           },
           {
             pieceType: DOCUMENT_TYPES.MEMORIE,
-            fileTypes: ['isWord', 'isPdf', 'isSigned']
+            fileTypes: ['isWord', 'isSigned']
           },
           {
             pieceType: DOCUMENT_TYPES.NOTA,
@@ -91,15 +94,15 @@ const DOCUMENT_REQUIREMENTS = [
         requiredPieces: [
           {
             pieceType: DOCUMENT_TYPES.BESLISSINGSFICHE,
-            fileTypes: ['isPdf', 'isSigned']
+            fileTypes: ['isSigned']
           },
           {
             pieceType: DOCUMENT_TYPES.DECREET,
-            fileTypes: ['isWord', 'isPdf']
+            fileTypes: ['isPdf']
           },
           {
             pieceType: DOCUMENT_TYPES.MEMORIE,
-            fileTypes: ['isWord', 'isPdf']
+            fileTypes: ['isPdf']
           },
           {
             pieceType: DOCUMENT_TYPES.NOTA,
@@ -107,6 +110,10 @@ const DOCUMENT_REQUIREMENTS = [
           },
           {
             pieceType: DOCUMENT_TYPES.ADVIES,
+            fileTypes: ['isPdf']
+          },
+          {
+            pieceType: DOCUMENT_TYPES.ADVIES_IF,
             fileTypes: ['isPdf']
           }
         ]

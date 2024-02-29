@@ -7,10 +7,19 @@ import {
   isAgendaItemReadyForVP,
   getMissingPieces,
 } from './lib/agendaitem';
-import { getPieceMetadata, getSubmittedPieces } from './lib/piece';
-import { PARLIAMENT_FLOW_STATUSES } from './config';
+import {
+  getPieceMetadata,
+  filterRedundantFiles,
+  getSubmittedPieces
+} from './lib/piece';
+import {
+  ENABLE_DEBUG_FILE_WRITING,
+  ENABLE_SENDING_TO_VP_API,
+  ENABLE_ALWAYS_CREATE_PARLIAMENT_FLOW,
+  PARLIAMENT_FLOW_STATUSES
+} from './config';
 
-import { syncFlowsByStatus } from "./lib/sync";
+import { syncFlowsByStatus } from './lib/sync';
 import { JobManager, cleanupOngoingJobs, createJob, getJob } from "./lib/jobs";
 
 /** Schedule report generation cron job */
@@ -40,6 +49,26 @@ const runJobManagerJob = CronJob.from({
 
 app.use(bodyParser.json());
 
+/* Route to verify the credentials for getting an access token */
+app.get('/verify-credentials/', async function (req, res, next) {
+  try {
+    const accessToken = await VP.getAccessToken();
+    if (accessToken) {
+      try {
+        const ping = await VP.ping();
+        console.log(ping);
+        return res.send({ message: 'Credentials valid. Access token was successfully retrieved and service is reachable.'});
+      } catch (e) {
+        return res.send({ error: 'Error while pinging VP-API: ' + JSON.stringify(e) });
+      }
+    } else {
+      return res.send({ message: 'Credentials invalid! Access token could not be retrieved.'});
+    }
+  } catch (e) {
+    return res.send({ error: 'Error while retrieving access token: ' + JSON.stringify(e) });
+  }
+});
+
 app.get('/is-ready-for-vp/', async function (req, res, next) {
   const uri = req.query.uri;
   if (!uri) {
@@ -65,7 +94,8 @@ app.get('/pieces-ready-to-be-sent', async function (req, res, next) {
   const piecesUris = await getPieceUris(uri);
   const submitted = await getSubmittedPieces(piecesUris);
   if (piecesUris.length > 0) {
-    const ready = await getPieceMetadata(piecesUris);
+    const pieces = await getPieceMetadata(piecesUris);
+    const ready = filterRedundantFiles(pieces, submitted);
     const missing = await getMissingPieces(uri, [...ready, ...submitted]);
 
     return res.status(200).send({ data: { ready, missing } });
@@ -112,7 +142,7 @@ app.post('/', async function (req, res, next) {
     agendaitemUri,
     piecesUris,
     comment,
-    currentUser,
+    currentUser.uri,
     isComplete
   );
   jobManager.run();
