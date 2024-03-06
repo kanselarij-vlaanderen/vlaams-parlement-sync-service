@@ -6,6 +6,8 @@ const DOMAIN = process.env.VP_API_DOMAIN;
 const VP_API_CLIENT_ID = process.env.VP_API_CLIENT_ID;
 const VP_API_CLIENT_SECRET = process.env.VP_API_CLIENT_SECRET;
 const VP_GRAPH_URI = "http://mu.semte.ch/graphs/system/parliament";
+const KANSELARIJ_GRAPH_URI = "http://mu.semte.ch/graphs/organizations/kanselarij";
+const PUBLIC_GRAPH_URI = "http://mu.semte.ch/graphs/public";
 
 if ([DOMAIN, VP_API_CLIENT_ID, VP_API_CLIENT_SECRET].some((envVar) => !envVar)) {
   console.warn(
@@ -27,6 +29,9 @@ const DOCUMENT_TYPES = {
   MEMORIE: 'http://themis.vlaanderen.be/id/concept/document-type/f036e016-268e-4611-8fee-77d2047b51d8',
   NOTA: 'http://themis.vlaanderen.be/id/concept/document-type/f2b0f655-8ed7-4f61-8f2b-ca813de7a6ed',
   ADVIES: 'http://themis.vlaanderen.be/id/concept/document-type/fb931eff-38f2-4743-802b-4240c35b8b0c',
+  ADVIES_IF: 'http://themis.vlaanderen.be/id/concept/document-type/351ba62d-eeff-4b08-b1e3-0a56d38116c4',
+  BIJLAGE: 'http://themis.vlaanderen.be/id/concept/document-type/b3e150d3-eac6-44cf-9e70-dd4d13423631',
+  BEGROTINGSAKKOORD: 'http://themis.vlaanderen.be/id/concept/document-type/6870daa2-d80a-4483-a78f-53cbd6b85af2',
 };
 
 const SUBCASE_TYPES = {
@@ -64,15 +69,15 @@ const DOCUMENT_REQUIREMENTS = [
         requiredPieces: [
           {
             pieceType: DOCUMENT_TYPES.BESLISSINGSFICHE,
-            fileTypes: ['isPdf', 'isSigned']
+            fileTypes: ['isSigned']
           },
           {
             pieceType: DOCUMENT_TYPES.DECREET,
-            fileTypes: ['isWord', 'isPdf', 'isSigned']
+            fileTypes: ['isWord', 'isSigned']
           },
           {
             pieceType: DOCUMENT_TYPES.MEMORIE,
-            fileTypes: ['isWord', 'isPdf', 'isSigned']
+            fileTypes: ['isWord', 'isSigned']
           },
           {
             pieceType: DOCUMENT_TYPES.NOTA,
@@ -89,7 +94,7 @@ const DOCUMENT_REQUIREMENTS = [
         requiredPieces: [
           {
             pieceType: DOCUMENT_TYPES.BESLISSINGSFICHE,
-            fileTypes: ['isPdf', 'isSigned']
+            fileTypes: ['isSigned']
           },
           {
             pieceType: DOCUMENT_TYPES.DECREET,
@@ -106,6 +111,10 @@ const DOCUMENT_REQUIREMENTS = [
           {
             pieceType: DOCUMENT_TYPES.ADVIES,
             fileTypes: ['isPdf']
+          },
+          {
+            pieceType: DOCUMENT_TYPES.ADVIES_IF,
+            fileTypes: ['isPdf']
           }
         ]
       }
@@ -118,6 +127,20 @@ const VP_PARLIAMENT_FLOW_STATUSES = {
 }
 
 const VP_ERROR_EXPIRE_TIME = 60;
+
+const JOB = {
+  STATUSES: {
+    SCHEDULED: "http://redpencil.data.gift/id/concept/JobStatus/scheduled",
+    BUSY: "http://redpencil.data.gift/id/concept/JobStatus/busy",
+    SUCCESS: "http://redpencil.data.gift/id/concept/JobStatus/success",
+    FAILED: "http://redpencil.data.gift/id/concept/JobStatus/failed",
+  },
+  GRAPH: VP_GRAPH_URI,
+  RESOURCE_BASE_URI:
+    "http://mu.semte.ch/services/vlaams-parlement-sync/send-to-parliament-job/",
+  CONTEXT_RESOURCE_BASE_URI:
+    "http://mu.semte.ch/services/vlaams-parlement-sync/send-to-parliament-job-context/",
+};
 
 export {
   DOMAIN,
@@ -134,5 +157,8 @@ export {
   ENABLE_ALWAYS_CREATE_PARLIAMENT_FLOW,
   DOCUMENT_REQUIREMENTS,
   VP_GRAPH_URI,
-  VP_ERROR_EXPIRE_TIME
+  VP_ERROR_EXPIRE_TIME,
+  KANSELARIJ_GRAPH_URI,
+  PUBLIC_GRAPH_URI,
+  JOB,
 };
