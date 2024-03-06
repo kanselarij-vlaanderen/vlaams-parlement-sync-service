@@ -1,6 +1,7 @@
 import { app, errorHandler } from 'mu';
 import bodyParser from 'body-parser';
 import { CronJob } from 'cron';
+import VP from './lib/vp';
 import { fetchCurrentUser } from "./lib/utils";
 import {
   getPieceUris,
@@ -19,17 +20,14 @@ import {
   PARLIAMENT_FLOW_STATUSES
 } from './config';
 
-import { syncFlowsByStatus } from './lib/sync';
+import { syncFlowsByStatus, syncSubmittedFlows } from './lib/sync';
 import { JobManager, cleanupOngoingJobs, createJob, getJob } from "./lib/jobs";
 
 /** Schedule report generation cron job */
 const cronPattern = process.env.POLLING_CRON_PATTERN || '0 0 7 * * *';
 const cronJob = new CronJob(
 	cronPattern,
-	function () {
-    const { COMPLETE, INCOMPLETE } = PARLIAMENT_FLOW_STATUSES;
-    syncFlowsByStatus([COMPLETE, INCOMPLETE]);
-	}, // onTick
+	syncSubmittedFlows, // onTick
 	null, // onComplete
 	true, // start
 );
@@ -109,6 +107,11 @@ app.get('/pieces-ready-to-be-sent', async function (req, res, next) {
 
 app.post('/debug-resync-error-flows', async function (req, res, next) {
   await syncFlowsByStatus([PARLIAMENT_FLOW_STATUSES.VP_ERROR]);
+  return res.status(204).send();
+});
+
+app.post('/debug-resync-submitted-to-parliament', async function (req, res, next) {
+  await syncSubmittedFlows();
   return res.status(204).send();
 })
 
