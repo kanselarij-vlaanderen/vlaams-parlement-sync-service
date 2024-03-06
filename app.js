@@ -1,6 +1,7 @@
 import { app, errorHandler } from 'mu';
 import bodyParser from 'body-parser';
 import { CronJob } from 'cron';
+import VP from './lib/vp';
 import { fetchCurrentUser } from "./lib/utils";
 import {
   getPieceUris,
