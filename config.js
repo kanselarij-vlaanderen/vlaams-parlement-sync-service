@@ -11,6 +11,7 @@ const EMAIL_GRAPH_URI = "http://mu.semte.ch/graphs/system/email";
 
 const KALEIDOS_HOST_URL = process.env.KALEIDOS_HOST_URL ?? 'https://kaleidos.vlaanderen.be/';
 const EMAIL_TO_ADDRESS = process.env.EMAIL_TO_ADDRESS;
+const PUBLIC_GRAPH_URI = "http://mu.semte.ch/graphs/public";
 
 if ([DOMAIN, VP_API_CLIENT_ID, VP_API_CLIENT_SECRET].some((envVar) => !envVar)) {
   console.warn(
@@ -38,6 +39,8 @@ const DOCUMENT_TYPES = {
   RESOLUTIE: 'http://themis.vlaanderen.be/id/concept/document-type/2fef8c6a-ca60-4cd5-97b3-578144aece0a',
   VERWIJZINGSFICHE: 'http://themis.vlaanderen.be/id/concept/document-type/205bb487-127c-43c6-9a8a-9b397a99f056',
   BIJLAGE: 'http://themis.vlaanderen.be/id/concept/document-type/b3e150d3-eac6-44cf-9e70-dd4d13423631',
+  ADVIES_IF: 'http://themis.vlaanderen.be/id/concept/document-type/351ba62d-eeff-4b08-b1e3-0a56d38116c4',
+  BEGROTINGSAKKOORD: 'http://themis.vlaanderen.be/id/concept/document-type/6870daa2-d80a-4483-a78f-53cbd6b85af2',
 };
 
 const SUBCASE_TYPES = {
@@ -81,15 +84,15 @@ const DOCUMENT_REQUIREMENTS = [
         requiredPieces: [
           {
             pieceType: DOCUMENT_TYPES.BESLISSINGSFICHE,
-            fileTypes: ['isPdf', 'isSigned']
+            fileTypes: ['isSigned']
           },
           {
             pieceType: DOCUMENT_TYPES.DECREET,
-            fileTypes: ['isWord', 'isPdf', 'isSigned']
+            fileTypes: ['isWord', 'isSigned']
           },
           {
             pieceType: DOCUMENT_TYPES.MEMORIE,
-            fileTypes: ['isWord', 'isPdf', 'isSigned']
+            fileTypes: ['isWord', 'isSigned']
           },
           {
             pieceType: DOCUMENT_TYPES.NOTA,
@@ -106,7 +109,7 @@ const DOCUMENT_REQUIREMENTS = [
         requiredPieces: [
           {
             pieceType: DOCUMENT_TYPES.BESLISSINGSFICHE,
-            fileTypes: ['isPdf', 'isSigned']
+            fileTypes: ['isSigned']
           },
           {
             pieceType: DOCUMENT_TYPES.DECREET,
@@ -123,6 +126,10 @@ const DOCUMENT_REQUIREMENTS = [
           {
             pieceType: DOCUMENT_TYPES.ADVIES,
             fileTypes: ['isPdf']
+          },
+          {
+            pieceType: DOCUMENT_TYPES.ADVIES_IF,
+            fileTypes: ['isPdf']
           }
         ]
       }
@@ -135,6 +142,20 @@ const VP_PARLIAMENT_FLOW_STATUSES = {
 }
 
 const VP_ERROR_EXPIRE_TIME = 60;
+
+const JOB = {
+  STATUSES: {
+    SCHEDULED: "http://redpencil.data.gift/id/concept/JobStatus/scheduled",
+    BUSY: "http://redpencil.data.gift/id/concept/JobStatus/busy",
+    SUCCESS: "http://redpencil.data.gift/id/concept/JobStatus/success",
+    FAILED: "http://redpencil.data.gift/id/concept/JobStatus/failed",
+  },
+  GRAPH: VP_GRAPH_URI,
+  RESOURCE_BASE_URI:
+    "http://mu.semte.ch/services/vlaams-parlement-sync/send-to-parliament-job/",
+  CONTEXT_RESOURCE_BASE_URI:
+    "http://mu.semte.ch/services/vlaams-parlement-sync/send-to-parliament-job-context/",
+};
 
 export {
   DOMAIN,
@@ -159,4 +180,6 @@ export {
   EMAIL_TO_ADDRESS,
   KALEIDOS_HOST_URL,
   VP_ERROR_EXPIRE_TIME
+  PUBLIC_GRAPH_URI,
+  JOB,
 };
