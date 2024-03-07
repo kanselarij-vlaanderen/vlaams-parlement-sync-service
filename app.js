@@ -24,15 +24,16 @@ import { syncFlowsByStatus, syncIncomingFlows, syncSubmittedFlows } from './lib/
 import { JobManager, cleanupOngoingJobs, createJob, getJob } from "./lib/jobs";
 
 /** Schedule VP flows sync cron job */
-const cronPattern = process.env.POLLING_CRON_PATTERN || '0 0 7 * * *';
+const statusCronPattern = process.env.STATUS_POLLING_CRON_PATTERN || process.env.POLLING_CRON_PATTERN || '0 0 7 * * *';
+const incomingCronPattern = process.env.INCOMING_POLLING_CRON_PATTERN || process.env.POLLING_CRON_PATTERN || '0 0 7 * * *';
 new CronJob(
-	cronPattern,
+	statusCronPattern,
 	syncSubmittedFlows, // onTick
 	null, // onComplete
 	false, // start
 );
 new CronJob(
-	cronPattern,
+	incomingCronPattern,
 	syncIncomingFlows, // onTick
 	null, // onComplete
 	false, // start
@@ -121,7 +122,6 @@ app.post('/debug-resync-submitted-to-parliament', async function (req, res, next
   return res.status(204).send();
 })
 
-console.log("Current directory:", process.cwd());
 app.post('/debug-resync-incoming-flows', async function (req, res, next) {
   await syncIncomingFlows();
   return res.status(204).send();
