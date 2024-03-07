@@ -20,16 +20,23 @@ import {
   PARLIAMENT_FLOW_STATUSES
 } from './config';
 
-import { syncFlowsByStatus, syncSubmittedFlows } from './lib/sync';
+import { syncFlowsByStatus, syncIncomingFlows, syncSubmittedFlows } from './lib/sync';
 import { JobManager, cleanupOngoingJobs, createJob, getJob } from "./lib/jobs";
 
-/** Schedule report generation cron job */
-const cronPattern = process.env.POLLING_CRON_PATTERN || '0 0 7 * * *';
-const cronJob = new CronJob(
-	cronPattern,
+/** Schedule VP flows sync cron job */
+const statusCronPattern = process.env.STATUS_POLLING_CRON_PATTERN || process.env.POLLING_CRON_PATTERN || '0 0 7 * * *';
+const incomingCronPattern = process.env.INCOMING_POLLING_CRON_PATTERN || process.env.POLLING_CRON_PATTERN || '0 0 7 * * *';
+new CronJob(
+	statusCronPattern,
 	syncSubmittedFlows, // onTick
 	null, // onComplete
-	true, // start
+	false, // start
+);
+new CronJob(
+	incomingCronPattern,
+	syncIncomingFlows, // onTick
+	null, // onComplete
+	false, // start
 );
 
 cleanupOngoingJobs();
@@ -112,6 +119,11 @@ app.post('/debug-resync-error-flows', async function (req, res, next) {
 
 app.post('/debug-resync-submitted-to-parliament', async function (req, res, next) {
   await syncSubmittedFlows();
+  return res.status(204).send();
+})
+
+app.post('/debug-resync-incoming-flows', async function (req, res, next) {
+  await syncIncomingFlows();
   return res.status(204).send();
 })
 
