@@ -10,7 +10,7 @@ Add the following snippet to your `docker-compose.yml` file to include the vlaam
 
 ```yml
 vlaams-parlement-sync:
-  image: kanselarij/vlaams-parlement-sync-service:0.3.7
+  image: kanselarij/vlaams-parlement-sync-service:0.3.8
   volumes:
     - ./data/files:/share # To access the files
     - ./data/debug:/debug # Writes payload.json for debug purposes — warning! it's a big file! your editor may struggle to open it
