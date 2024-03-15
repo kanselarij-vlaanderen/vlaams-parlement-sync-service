@@ -10,7 +10,7 @@ const KANSELARIJ_GRAPH_URI = "http://mu.semte.ch/graphs/organizations/kanselarij
 const EMAIL_GRAPH_URI = "http://mu.semte.ch/graphs/system/email";
 
 const KALEIDOS_HOST_URL = process.env.KALEIDOS_HOST_URL ?? 'https://kaleidos.vlaanderen.be/';
-cosnt EMAIL_FROM_ADDRESS = process.env.EMAIL_FROM_ADDRESS ?? 'noreply@kaleidos.vlaanderen.be';
+const EMAIL_FROM_ADDRESS = process.env.EMAIL_FROM_ADDRESS ?? 'noreply@kaleidos.vlaanderen.be';
 const EMAIL_TO_ADDRESS = process.env.EMAIL_TO_ADDRESS;
 const PUBLIC_GRAPH_URI = "http://mu.semte.ch/graphs/public";
 
