@@ -15,9 +15,6 @@ import {
   getSubmittedPieces
 } from './lib/piece';
 import {
-  ENABLE_DEBUG_FILE_WRITING,
-  ENABLE_SENDING_TO_VP_API,
-  ENABLE_ALWAYS_CREATE_PARLIAMENT_FLOW,
   PARLIAMENT_FLOW_STATUSES
 } from './config';
 
