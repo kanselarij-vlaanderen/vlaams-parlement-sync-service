@@ -30,13 +30,13 @@ new CronJob(
 	statusCronPattern,
 	syncSubmittedFlows, // onTick
 	null, // onComplete
-	false, // start
+	true, // start
 );
 new CronJob(
 	incomingCronPattern,
 	syncIncomingFlows, // onTick
 	null, // onComplete
-	false, // start
+	true, // start
 );
 
 cleanupOngoingJobs();
