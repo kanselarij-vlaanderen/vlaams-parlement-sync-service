@@ -7,6 +7,7 @@ import {
   getPieceUris,
   isAgendaItemReadyForVP,
   getMissingPieces,
+  getRequiredPieces,
 } from './lib/agendaitem';
 import {
   getPieceMetadata,
@@ -14,9 +15,6 @@ import {
   getSubmittedPieces
 } from './lib/piece';
 import {
-  ENABLE_DEBUG_FILE_WRITING,
-  ENABLE_SENDING_TO_VP_API,
-  ENABLE_ALWAYS_CREATE_PARLIAMENT_FLOW,
   PARLIAMENT_FLOW_STATUSES
 } from './config';
 
@@ -102,12 +100,14 @@ app.get('/pieces-ready-to-be-sent', async function (req, res, next) {
     const pieces = await getPieceMetadata(piecesUris);
     const ready = filterRedundantFiles(pieces, submitted);
     const missing = await getMissingPieces(uri, [...ready, ...submitted]);
+    const required = await getRequiredPieces(uri, [...ready]);
 
-    return res.status(200).send({ data: { ready, missing } });
+    return res.status(200).send({ data: { ready, missing, required } });
   }
   return res.status(200).send({ data: {
       ready: [],
-      missing: await getMissingPieces(uri, [...submitted])
+      missing: await getMissingPieces(uri, [...submitted]),
+      required: []
     }
   });
 });
