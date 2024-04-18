@@ -5,7 +5,7 @@
 
 
 ## Tutorials
-### Add the html-to-pdf-service to a stack
+### Add the vlaams-parlement-sync-service to a stack
 Add the following snippet to your `docker-compose.yml` file to include the vlaams-parlement-sync service in your project.
 
 ```yml
