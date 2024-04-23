@@ -156,6 +156,21 @@ app.post('/debug-resync-incoming-flows', async function (req, res, next) {
   return res.status(204).send();
 })
 
+/* Note: this can be called from an active session in the browser,
+   or from a forwarded port on the container.
+   Use this command in the console:
+   fetch('/vlaams-parlement-sync/debug-check-pobj-status?pobj=1795047')
+   and then check the response in the network tab
+*/
+app.get('/debug-check-pobj-status', async function (req, res, next) {
+  if (req.query.pobj) {
+    let statuses = await VP.getStatusForFlow(req.query.pobj);
+    return res.status(200).send(JSON.stringify(statuses));
+  } else {
+    return res.status(400).send("pobj must be provided");
+  }
+})
+
 app.post('/', async function (req, res, next) {
   console.log("Sending dossier...");
   console.log(req.body);
