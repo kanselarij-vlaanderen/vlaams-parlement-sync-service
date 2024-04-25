@@ -80,6 +80,28 @@ app.get('/verify-credentials/', async function (req, res, next) {
   }
 });
 
+app.get('/healthcheck', async function (_req, res, next) {
+  try {
+    console.log('Doing a healthcheck');
+    const accessToken = await VP.getAccessToken();
+    if (accessToken) {
+      try {
+        await VP.ping();
+        await VP.fetchSubmittedFlows();
+        await VP.fetchIncomingFlows();
+        console.log('Healthcheck finished successfully');
+        return res.send({ message: 'Credentials valid, VP endpoints are not returning any errors and service is reachable.'});
+      } catch (e) {
+        return next({ message: 'Error while reaching VP-API: ' + JSON.stringify(e) });
+      }
+    } else {
+      return next({ message: 'Credentials invalid! Access token could not be retrieved.'});
+    }
+  } catch (e) {
+    return next({ message: 'Error while retrieving access token: ' + JSON.stringify(e) });
+  }
+});
+
 app.get('/is-ready-for-vp/', async function (req, res, next) {
   const uri = req.query.uri;
   if (!uri) {
