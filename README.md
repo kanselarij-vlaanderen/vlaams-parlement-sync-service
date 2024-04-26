@@ -23,6 +23,11 @@ The service supports the following environment variables:
       ENABLE_SENDING_TO_VP_API: false # enable/disable the actual call to the VP-API
       ENABLE_DEBUG_FILE_WRITING: true # writes payload.json, response.json, and pieces.json to /debug
       ENABLE_ALWAYS_CREATE_PARLIAMENT_FLOW: true # always creates a (mock) parliament-flow, even when ENABLE_SENDING_TO_VP_API is false
+      ENABLE_MOCK_INCOMING_FLOWS: true # use mock data for incoming flows, creating new subcases
+      ENABLE_MOCK_VERWERKT_FILES: true # use mock data to indicate that we've processed a submitted file
+      ENABLE_MOCK_SUBMITTED_FLOWS: true # use mock data to check status of submitted flows
+      STATUS_POLLING_CRON_PATTERN: "0 0 0 1 1 1"
+      INCOMING_POLLING_CRON_PATTERN: "0 0 0 1 1 1"
       VP_API_DOMAIN: "https://replace.by.actual.api.url"
       VP_API_CLIENT_ID: "yourVpApiClientId"
       VP_API_CLIENT_SECRET: "yourVpApiClientSecret"
