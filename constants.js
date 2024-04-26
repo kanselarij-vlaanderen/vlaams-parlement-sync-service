@@ -1,4 +1,5 @@
 import { sparqlEscapeUri } from "mu";
+import { VP_GRAPH_URI, KANSELARIJ_GRAPH_URI, EMAIL_GRAPH_URI } from "./config";
 
 const RESOURCE_BASE = "http://themis.vlaanderen.be/id/";
 
@@ -28,4 +29,17 @@ const prefixHeaderLines = Object.fromEntries(
   ])
 );
 
-export { prefixHeaderLines, RESOURCE_BASE };
+const graphs = {
+  kanselarij: { uri: KANSELARIJ_GRAPH_URI },
+  email: { uri: EMAIL_GRAPH_URI },
+  parliament: { uri: VP_GRAPH_URI },
+};
+
+const escapedGraphs = Object.fromEntries(
+  Object.entries(graphs).map(([graphName, { uri }]) => [
+    graphName,
+    sparqlEscapeUri(uri),
+  ])
+);
+
+export { prefixHeaderLines, RESOURCE_BASE, escapedGraphs };
