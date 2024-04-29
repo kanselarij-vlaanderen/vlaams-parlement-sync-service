@@ -80,6 +80,28 @@ app.get('/verify-credentials/', async function (req, res, next) {
   }
 });
 
+app.get('/healthcheck', async function (_req, res, next) {
+  try {
+    console.log('Doing a healthcheck');
+    const accessToken = await VP.getAccessToken();
+    if (accessToken) {
+      try {
+        await VP.ping();
+        await VP.fetchSubmittedFlows();
+        await VP.fetchIncomingFlows();
+        console.log('Healthcheck finished successfully');
+        return res.send({ message: 'Credentials valid, VP endpoints are not returning any errors and service is reachable.'});
+      } catch (e) {
+        return next({ message: 'Error while reaching VP-API: ' + JSON.stringify(e) });
+      }
+    } else {
+      return next({ message: 'Credentials invalid! Access token could not be retrieved.'});
+    }
+  } catch (e) {
+    return next({ message: 'Error while retrieving access token: ' + JSON.stringify(e) });
+  }
+});
+
 app.get('/is-ready-for-vp/', async function (req, res, next) {
   const uri = req.query.uri;
   if (!uri) {
@@ -154,6 +176,36 @@ app.post('/debug-resync-submitted-to-parliament', async function (req, res, next
 app.post('/debug-resync-incoming-flows', async function (req, res, next) {
   await syncIncomingFlows();
   return res.status(204).send();
+})
+
+/* Note: this can be called from an active session in the browser,
+   or from a forwarded port on the container.
+   Use this command in the console:
+   fetch('/vlaams-parlement-sync/debug-check-pobj-status?pobj=1795047')
+   and then check the response in the network tab
+*/
+app.get('/debug-check-pobj-status', async function (req, res, next) {
+  if (req.query.pobj) {
+    let statuses = await VP.getStatusForFlow(req.query.pobj);
+    return res.status(200).send(JSON.stringify(statuses));
+  } else {
+    return res.status(400).send("pobj must be provided");
+  }
+})
+
+/* Note: this can be called from an active session in the browser,
+   or from a forwarded port on the container.
+   Use this command in the console:
+   fetch('/vlaams-parlement-sync/debug-check-submitted-flows?dagen=30')
+   and then check the response in the network tab
+*/
+app.get('/debug-check-submitted-flows', async function (req, res, next) {
+  let days;
+  if (req.query.dagen) {
+    days = +req.query.dagen;
+  }
+  let docs = await VP.fetchSubmittedFlows(days);
+  return res.status(200).send(JSON.stringify(docs));
 })
 
 app.post('/', async function (req, res, next) {
