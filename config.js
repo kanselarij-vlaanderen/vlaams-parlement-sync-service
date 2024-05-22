@@ -75,6 +75,10 @@ const PARLIAMENT_FLOW_STATUSES = {
   RECEIVED: 'http://themis.vlaanderen.be/id/parlementaireaangelegenheid-status/879aed2f-6efa-4d7b-ab1b-13cc406b1f92',
 };
 
+const MANDATE_ROLES = {
+  MINISTER_PRESIDENT: "http://themis.vlaanderen.be/id/mandaat/5fed907ee6670526694a0702",
+}
+
 /** These requirements are used to check for the existence of a documentType
  * on the current agendaitem, and then loop over the pieces & subcases to see
  * which pieces and files are required.
@@ -172,6 +176,7 @@ export {
   ACCESS_LEVELS,
   PARLIAMENT_FLOW_STATUSES,
   VP_PARLIAMENT_FLOW_STATUSES,
+  MANDATE_ROLES,
   ENABLE_DEBUG_FILE_WRITING,
   ENABLE_SENDING_TO_VP_API,
   ENABLE_ALWAYS_CREATE_PARLIAMENT_FLOW,
