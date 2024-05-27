@@ -24,26 +24,26 @@ import { JobManager, cleanupOngoingJobs, createJob, getJob } from "./lib/jobs";
 /** Schedule VP flows sync cron job */
 const statusCronPattern = process.env.STATUS_POLLING_CRON_PATTERN || process.env.POLLING_CRON_PATTERN || '0 0 7 * * *';
 const incomingCronPattern = process.env.INCOMING_POLLING_CRON_PATTERN || process.env.POLLING_CRON_PATTERN || '0 0 7 * * *';
+
 console.log('syncSubmittedFlows set to CRON pattern ' + statusCronPattern);
-new CronJob(
-	statusCronPattern,
-	() => {
+CronJob.from({
+  cronTime: statusCronPattern,
+  onTick: () => {
     console.log(`syncSubmittedFlows triggered by cron job at ${new Date().toISOString()}`);
     syncSubmittedFlows(true)
-  }, // onTick
-	null, // onComplete
-	true, // start
-);
+  },
+  start: true
+});
+
 console.log('syncIncomingFlows set to CRON pattern ' + incomingCronPattern);
-new CronJob(
-	incomingCronPattern,
-	() => {
+CronJob.from({
+  cronTime: incomingCronPattern,
+  onTick: () => {
     console.log(`syncIncomingFlows triggered by cron job at ${new Date().toISOString()}`);
     syncIncomingFlows(true)
-  }, // onTick
-	null, // onComplete
-	true, // start
-);
+  },
+  start: true,
+});
 
 cleanupOngoingJobs();
 
