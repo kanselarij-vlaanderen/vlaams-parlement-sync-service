@@ -49,7 +49,7 @@ cleanupOngoingJobs();
 
 const jobManager = new JobManager();
 jobManager.run();
-const runJobManagerJob = CronJob.from({
+CronJob.from({
   cronTime: "0 * * * * *",
   onTick: function () {
     console.log(`Jobs triggered by cron job at ${new Date().toISOString()}`);
