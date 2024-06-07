@@ -220,7 +220,7 @@ app.get('/debug-check-incoming-flows', async function (req, res, next) {
   if (req.query.dagen) {
     days = +req.query.dagen;
   }
-  let docs = await VP.fetchIncomingFlows();
+  let docs = await VP.fetchIncomingFlows(true);
   return res.status(200).send(JSON.stringify(docs));
 })
 
