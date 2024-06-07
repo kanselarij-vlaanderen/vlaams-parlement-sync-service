@@ -208,6 +208,22 @@ app.get('/debug-check-submitted-flows', async function (req, res, next) {
   return res.status(200).send(JSON.stringify(docs));
 })
 
+
+/* Note: this can be called from an active session in the browser,
+   or from a forwarded port on the container.
+   Use this command in the console:
+   fetch('/vlaams-parlement-sync/debug-check-incoming-flows')
+   and then check the response in the network tab
+*/
+app.get('/debug-check-incoming-flows', async function (req, res, next) {
+  let days;
+  if (req.query.dagen) {
+    days = +req.query.dagen;
+  }
+  let docs = await VP.fetchIncomingFlows();
+  return res.status(200).send(JSON.stringify(docs));
+})
+
 app.post('/', async function (req, res, next) {
   console.log("Sending dossier...");
   console.log(req.body);
