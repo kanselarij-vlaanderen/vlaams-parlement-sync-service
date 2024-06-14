@@ -212,15 +212,13 @@ app.get('/debug-check-submitted-flows', async function (req, res, next) {
 /* Note: this can be called from an active session in the browser,
    or from a forwarded port on the container.
    Use this command in the console:
-   fetch('/vlaams-parlement-sync/debug-check-incoming-flows')
-   and then check the response in the network tab
+   fetch('/vlaams-parlement-sync/debug-check-incoming-flows?transform=true')
+   and then check the response in the network tab.
+   Set the transform query param to false (or omit it) to get the raw response
+   from VP
 */
 app.get('/debug-check-incoming-flows', async function (req, res, next) {
-  let days;
-  if (req.query.dagen) {
-    days = +req.query.dagen;
-  }
-  let docs = await VP.fetchIncomingFlows(true);
+  let docs = await VP.fetchIncomingFlows(true, (req.query.transform === 'true'));
   return res.status(200).send(JSON.stringify(docs));
 })
 
