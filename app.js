@@ -20,6 +20,7 @@ import {
 
 import { syncFlowsByStatus, syncIncomingFlows, syncSubmittedFlows } from './lib/sync';
 import { JobManager, cleanupOngoingJobs, createJob, getJob } from "./lib/jobs";
+import { getPobjFromParliamentflow } from './lib/parliament-flow';
 
 /** Schedule VP flows sync cron job */
 const statusCronPattern = process.env.STATUS_POLLING_CRON_PATTERN || process.env.POLLING_CRON_PATTERN || '0 0 7 * * *';
@@ -277,6 +278,41 @@ app.get("/send-to-vp-jobs/:uuid", async function (req, res) {
       .send({
         error: `Could not find send-to-vp-job with uuid ${req.params.uuid}`,
       });
+  }
+});
+
+app.post('/relink-decisionmaking-flow', async function (req, res, next) {
+  const decisionmakingFlowUri = req.body.decisionmakingFlowUri;
+  if (!decisionmakingFlowUri) {
+    return next({ message: 'Request body must contain "decisionmakingFlowUri" field', status: 400 });
+  }
+
+  const caseUri = req.body.caseUri;
+  if (!caseUri) {
+    return next({ message: 'Request body must contain "caseUri" field', status: 400 });
+  }
+
+  const parliamentFlowUri = req.body.parliamentFlowUri;
+  if (!parliamentFlowUri) {
+    return next({ message: 'Request body must contain "parliamentFlowUri" field', status: 400 });
+  }
+
+  try {
+    const { pobj } = await getPobjFromParliamentflow(parliamentFlowUri);
+
+    const decisionmakingFlow = {
+      uri: decisionmakingFlowUri,
+      case: caseUri,
+      pobj,
+    };
+    const payload = VP.generateNotificationPayload(decisionmakingFlow, null)
+    await VP.notifyReceivedDocument(payload);
+    return res.status(204).send();
+  } catch (e) {
+    return next({
+      message: `Something went wrong while notifying VP about decisionmaking flow change: ${e}`,
+      status: 500
+    });
   }
 });
 
