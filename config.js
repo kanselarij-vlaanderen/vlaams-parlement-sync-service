@@ -14,6 +14,8 @@ const EMAIL_FROM_ADDRESS = process.env.EMAIL_FROM_ADDRESS ?? 'noreply@kaleidos.v
 const EMAIL_TO_ADDRESS = process.env.EMAIL_TO_ADDRESS;
 const PUBLIC_GRAPH_URI = "http://mu.semte.ch/graphs/public";
 
+const SESSIONS_GRAPH_URI = "http://mu.semte.ch/graphs/sessions";
+
 if ([DOMAIN, VP_API_CLIENT_ID, VP_API_CLIENT_SECRET].some((envVar) => !envVar)) {
   console.warn(
     'Required environment variables were not set. Execution cannot proceed, logging variables and exiting.'
@@ -193,4 +195,5 @@ export {
   VP_ERROR_EXPIRE_TIME,
   PUBLIC_GRAPH_URI,
   JOB,
+  SESSIONS_GRAPH_URI
 };
