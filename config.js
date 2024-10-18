@@ -153,10 +153,10 @@ const VP_ERROR_EXPIRE_TIME = 60;
 
 const JOB = {
   STATUSES: {
-    SCHEDULED: "http://redpencil.data.gift/id/concept/JobStatus/scheduled",
-    BUSY: "http://redpencil.data.gift/id/concept/JobStatus/busy",
-    SUCCESS: "http://redpencil.data.gift/id/concept/JobStatus/success",
-    FAILED: "http://redpencil.data.gift/id/concept/JobStatus/failed",
+    SCHEDULED: "http://vocab.deri.ie/cogs#Scheduled",
+    BUSY: "http://vocab.deri.ie/cogs#Running",
+    SUCCESS: "http://vocab.deri.ie/cogs#Success",
+    FAILED: "http://vocab.deri.ie/cogs#Fail",
   },
   GRAPH: VP_GRAPH_URI,
   RESOURCE_BASE_URI:
