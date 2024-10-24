@@ -73,6 +73,7 @@ const PARLIAMENT_FLOW_STATUSES = {
   BEING_HANDLED: 'http://themis.vlaanderen.be/id/parlementaireaangelegenheid-status/3905d9a1-c841-42fc-8a89-3b7d4ad61b4b',
   VP_ERROR: 'http://themis.vlaanderen.be/id/parlementaireaangelegenheid-status/3d03c20e-0170-43f5-840e-a541d1fd22bd',
   RECEIVED: 'http://themis.vlaanderen.be/id/parlementaireaangelegenheid-status/879aed2f-6efa-4d7b-ab1b-13cc406b1f92',
+  REFUSED: 'http://themis.vlaanderen.be/id/parlementaireaangelegenheid-status/df0870a3-ce07-481d-9dbd-e95f0fd73a8b',
 };
 
 const MANDATE_ROLES = {
@@ -146,7 +147,8 @@ const DOCUMENT_REQUIREMENTS = [
 ];
 
 const VP_PARLIAMENT_FLOW_STATUSES = {
-  BEING_HANDLED: "te behandelen in commissie"
+  BEING_HANDLED: "te behandelen in commissie",
+  REFUSED: "niet ingeschreven"
 }
 
 const VP_ERROR_EXPIRE_TIME = 60;
