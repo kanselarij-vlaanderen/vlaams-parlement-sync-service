@@ -76,8 +76,8 @@ const PARLIAMENT_FLOW_STATUSES = {
   REFUSED: 'http://themis.vlaanderen.be/id/parlementaireaangelegenheid-status/df0870a3-ce07-481d-9dbd-e95f0fd73a8b',
 };
 
-const MANDATE_ROLES = {
-  MINISTER_PRESIDENT: "http://themis.vlaanderen.be/id/mandaat/5fed907ee6670526694a0702",
+const MANDATE_FUNCTIONS = {
+  MINISTER_PRESIDENT: "http://themis.vlaanderen.be/id/bestuursfunctie/5fed907ce6670526694a03de",
 }
 
 /** These requirements are used to check for the existence of a documentType
@@ -178,7 +178,7 @@ export {
   ACCESS_LEVELS,
   PARLIAMENT_FLOW_STATUSES,
   VP_PARLIAMENT_FLOW_STATUSES,
-  MANDATE_ROLES,
+  MANDATE_FUNCTIONS,
   ENABLE_DEBUG_FILE_WRITING,
   ENABLE_SENDING_TO_VP_API,
   ENABLE_ALWAYS_CREATE_PARLIAMENT_FLOW,
