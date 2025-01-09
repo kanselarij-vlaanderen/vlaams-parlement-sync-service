@@ -28,7 +28,7 @@ The service supports the following environment variables:
       ENABLE_MOCK_SUBMITTED_FLOWS: true # use mock data to check status of submitted flows
       STATUS_POLLING_CRON_PATTERN: "0 0 0 1 1 1"
       INCOMING_POLLING_CRON_PATTERN: "0 0 0 1 1 1"
-      EMAIL_FROM_ADDRESS: noreply@domain.com # defaults to noreply@kaleidos.vlaanderen.be
+      EMAIL_FROM_ADDRESS: noreply@domain.com # optional, defaults to noreply@kaleidos.vlaanderen.be
       EMAIL_TO_ADDRESS: address1@domain.com # send mails about VP updates, comma separated list
       EMAIL_TO_ADDRESS_ON_FAILURE: address2@domain.com, address3@domain.com # send mails on failure, comma separated list
       KALEIDOS_HOST_URL: https://kaleidos-test.vlaanderen.be/ # defaults to https://kaleidos.vlaanderen.be/
