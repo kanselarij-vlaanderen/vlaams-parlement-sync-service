@@ -151,7 +151,10 @@ const VP_PARLIAMENT_FLOW_STATUSES = {
   REFUSED: "niet ingeschreven"
 }
 
+// time is in seconds
 const VP_ERROR_EXPIRE_TIME = 60;
+// 10 minutes to account for the complete syncing process to happen
+const VP_SHORTENED_EXPIRE_TIME = 600;
 
 const JOB = {
   STATUSES: {
@@ -193,6 +196,7 @@ export {
   EMAIL_TO_ADDRESS,
   KALEIDOS_HOST_URL,
   VP_ERROR_EXPIRE_TIME,
+  VP_SHORTENED_EXPIRE_TIME,
   PUBLIC_GRAPH_URI,
   JOB,
 };
