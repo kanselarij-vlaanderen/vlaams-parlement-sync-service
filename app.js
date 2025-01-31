@@ -64,6 +64,7 @@ app.use(bodyParser.json());
 /* Route to verify the credentials for getting an access token */
 app.get('/verify-credentials/', async function (req, res, next) {
   try {
+    console.log('Verifying credentials');
     const accessToken = await VP.getAccessToken();
     if (accessToken) {
       try {
