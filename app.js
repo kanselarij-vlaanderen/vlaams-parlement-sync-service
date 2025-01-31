@@ -201,12 +201,16 @@ app.get('/debug-check-pobj-status', async function (req, res, next) {
    and then check the response in the network tab
 */
 app.get('/debug-check-submitted-flows', async function (req, res, next) {
-  let days;
-  if (req.query.dagen) {
-    days = +req.query.dagen;
+  try {
+    let days;
+    if (req.query.dagen) {
+      days = +req.query.dagen;
+    }
+    let docs = await VP.fetchSubmittedFlows(days);
+    return res.status(200).send(JSON.stringify(docs));
+  } catch (error) {
+    return res.status(500).send(JSON.stringify(error.message));
   }
-  let docs = await VP.fetchSubmittedFlows(days);
-  return res.status(200).send(JSON.stringify(docs));
 })
 
 
@@ -219,8 +223,12 @@ app.get('/debug-check-submitted-flows', async function (req, res, next) {
    from VP
 */
 app.get('/debug-check-incoming-flows', async function (req, res, next) {
-  let docs = await VP.fetchIncomingFlows(true, (req.query.transform === 'true'));
-  return res.status(200).send(JSON.stringify(docs));
+  try {
+    let docs = await VP.fetchIncomingFlows(true, (req.query.transform === 'true'));
+    return res.status(200).send(JSON.stringify(docs));
+  } catch (error) {
+    return res.status(500).send(JSON.stringify(error.message));
+  }
 })
 
 app.post('/', async function (req, res, next) {
