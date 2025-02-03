@@ -3,6 +3,10 @@ import { VP_GRAPH_URI, KANSELARIJ_GRAPH_URI, EMAIL_GRAPH_URI } from "./config";
 
 const RESOURCE_BASE = "http://themis.vlaanderen.be/id/";
 
+const ROLES = {
+  ADMIN: 'http://themis.vlaanderen.be/id/gebruikersrol/9a969b13-e80b-424f-8a82-a402bcb42bc5',
+}
+
 const prefixes = {
   adms: "http://www.w3.org/ns/adms#",
   besluitvorming: "https://data.vlaanderen.be/ns/besluitvorming#",
@@ -45,4 +49,4 @@ const escapedGraphs = Object.fromEntries(
   ])
 );
 
-export { prefixHeaderLines, RESOURCE_BASE, escapedGraphs };
+export { prefixHeaderLines, RESOURCE_BASE, escapedGraphs, ROLES };
