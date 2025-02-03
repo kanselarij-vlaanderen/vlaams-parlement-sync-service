@@ -1,6 +1,6 @@
 {
   "name": "vlaams-parlement-sync-service",
-  "version": "0.7.4",
+  "version": "0.7.6",
   "description": "Microservice to exchange data with Vlaams Parlement",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

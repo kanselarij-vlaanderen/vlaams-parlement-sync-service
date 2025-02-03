@@ -21,6 +21,8 @@ import {
 import { syncFlowsByStatus, syncIncomingFlows, syncSubmittedFlows } from './lib/sync';
 import { JobManager, cleanupOngoingJobs, createJob, getJob } from "./lib/jobs";
 import { getPobjFromParliamentflow } from './lib/parliament-flow';
+import { ROLES } from './constants';
+import { sessionHasRole } from './lib/session';
 
 /** Schedule VP flows sync cron job */
 const statusCronPattern = process.env.STATUS_POLLING_CRON_PATTERN || process.env.POLLING_CRON_PATTERN || '0 0 7 * * *';
@@ -152,6 +154,10 @@ app.get('/pieces-ready-to-be-sent', async function (req, res, next) {
    })
 */
 app.post('/debug-resync-error-flows', async function (req, res, next) {
+  const sessionUri = req.headers['mu-session-id'];
+  if (!(await sessionHasRole(sessionUri, [ROLES.ADMIN]))) {
+    return next({ message: 'You do not have the correct role to perform this operation', status: 401 });
+  }
   await syncFlowsByStatus([PARLIAMENT_FLOW_STATUSES.VP_ERROR]);
   return res.status(204).send();
 });
@@ -164,6 +170,10 @@ app.post('/debug-resync-error-flows', async function (req, res, next) {
    })
 */
 app.post('/debug-resync-submitted-to-parliament', async function (req, res, next) {
+  const sessionUri = req.headers['mu-session-id'];
+  if (!(await sessionHasRole(sessionUri, [ROLES.ADMIN]))) {
+    return next({ message: 'You do not have the correct role to perform this operation', status: 401 });
+  }
   await syncSubmittedFlows();
   return res.status(204).send();
 })
@@ -176,6 +186,10 @@ app.post('/debug-resync-submitted-to-parliament', async function (req, res, next
    })
 */
 app.post('/debug-resync-incoming-flows', async function (req, res, next) {
+  const sessionUri = req.headers['mu-session-id'];
+  if (!(await sessionHasRole(sessionUri, [ROLES.ADMIN]))) {
+    return next({ message: 'You do not have the correct role to perform this operation', status: 401 });
+  }
   await syncIncomingFlows();
   return res.status(204).send();
 })
@@ -187,6 +201,10 @@ app.post('/debug-resync-incoming-flows', async function (req, res, next) {
    and then check the response in the network tab
 */
 app.get('/debug-check-pobj-status', async function (req, res, next) {
+  const sessionUri = req.headers['mu-session-id'];
+  if (!(await sessionHasRole(sessionUri, [ROLES.ADMIN]))) {
+    return next({ message: 'You do not have the correct role to perform this operation', status: 401 });
+  }
   if (req.query.pobj) {
     let statuses = await VP.getStatusForFlow(req.query.pobj);
     return res.status(200).send(JSON.stringify(statuses));
@@ -202,6 +220,10 @@ app.get('/debug-check-pobj-status', async function (req, res, next) {
    and then check the response in the network tab
 */
 app.get('/debug-check-submitted-flows', async function (req, res, next) {
+  const sessionUri = req.headers['mu-session-id'];
+  if (!(await sessionHasRole(sessionUri, [ROLES.ADMIN]))) {
+    return next({ message: 'You do not have the correct role to perform this operation', status: 401 });
+  }
   try {
     let days;
     if (req.query.dagen) {
@@ -224,6 +246,10 @@ app.get('/debug-check-submitted-flows', async function (req, res, next) {
    from VP
 */
 app.get('/debug-check-incoming-flows', async function (req, res, next) {
+  const sessionUri = req.headers['mu-session-id'];
+  if (!(await sessionHasRole(sessionUri, [ROLES.ADMIN]))) {
+    return next({ message: 'You do not have the correct role to perform this operation', status: 401 });
+  }
   try {
     let docs = await VP.fetchIncomingFlows(true, (req.query.transform === 'true'));
     return res.status(200).send(JSON.stringify(docs));
