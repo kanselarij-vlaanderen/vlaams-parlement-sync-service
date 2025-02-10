@@ -12,6 +12,7 @@ const EMAIL_GRAPH_URI = "http://mu.semte.ch/graphs/system/email";
 const KALEIDOS_HOST_URL = process.env.KALEIDOS_HOST_URL ?? 'https://kaleidos.vlaanderen.be/';
 const EMAIL_FROM_ADDRESS = process.env.EMAIL_FROM_ADDRESS ?? 'noreply@kaleidos.vlaanderen.be';
 const EMAIL_TO_ADDRESS = process.env.EMAIL_TO_ADDRESS;
+const EMAIL_TO_ADDRESS_ON_FAILURE = process.env.EMAIL_TO_ADDRESS_ON_FAILURE;
 const PUBLIC_GRAPH_URI = "http://mu.semte.ch/graphs/public";
 
 if ([DOMAIN, VP_API_CLIENT_ID, VP_API_CLIENT_SECRET].some((envVar) => !envVar)) {
@@ -194,6 +195,7 @@ export {
   EMAIL_GRAPH_URI,
   EMAIL_FROM_ADDRESS,
   EMAIL_TO_ADDRESS,
+  EMAIL_TO_ADDRESS_ON_FAILURE,
   KALEIDOS_HOST_URL,
   VP_ERROR_EXPIRE_TIME,
   VP_SHORTENED_EXPIRE_TIME,
