@@ -174,6 +174,7 @@ app.post('/debug-resync-submitted-to-parliament', async function (req, res, next
   if (!(await sessionHasRole(sessionUri, [ROLES.ADMIN]))) {
     return next({ message: 'You do not have the correct role to perform this operation', status: 401 });
   }
+  console.log(`syncSubmittedFlows triggered by debug endpoint at ${new Date().toISOString()}`);
   await syncSubmittedFlows();
   return res.status(204).send();
 })
@@ -190,6 +191,7 @@ app.post('/debug-resync-incoming-flows', async function (req, res, next) {
   if (!(await sessionHasRole(sessionUri, [ROLES.ADMIN]))) {
     return next({ message: 'You do not have the correct role to perform this operation', status: 401 });
   }
+  console.log(`syncIncomingFlows triggered by debug endpoint at ${new Date().toISOString()}`);
   await syncIncomingFlows();
   return res.status(204).send();
 })
