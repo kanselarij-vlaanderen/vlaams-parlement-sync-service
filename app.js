@@ -343,7 +343,7 @@ app.post('/relink-decisionmaking-flow', async function (req, res, next) {
       pobj,
     };
     const payload = VP.generateNotificationPayload(decisionmakingFlow, null)
-    await VP.notifyReceivedDocument(payload);
+    await VP.notifyReceivedDocument(payload, shouldThrowOnError = true);
     return res.status(204).send();
   } catch (e) {
     return next({
