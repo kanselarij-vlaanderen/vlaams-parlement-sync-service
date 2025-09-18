@@ -165,6 +165,8 @@ const JOB = {
     FAILED: "http://redpencil.data.gift/id/concept/JobStatus/failed",
   },
   GRAPH: VP_GRAPH_URI,
+  RDF_TYPE: "http://mu.semte.ch/vocabularies/ext/SendToVpJob",
+  CONTEXT_RDF_TYPE: "http://mu.semte.ch/vocabularies/ext/SendToVpJobContext",
   RESOURCE_BASE_URI:
     "http://mu.semte.ch/services/vlaams-parlement-sync/send-to-parliament-job/",
   CONTEXT_RESOURCE_BASE_URI:
