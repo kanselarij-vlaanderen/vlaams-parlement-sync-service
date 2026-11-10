@@ -14,6 +14,8 @@ vlaams-parlement-sync:
   volumes:
     - ./data/files:/share # To access the files
     - ./data/debug:/debug # Writes payload.json for debug purposes — warning! it's a big file! your editor may struggle to open it
+  environment:
+    ALLOW_MU_AUTH_SUDO: "true"
 ```
 
 The service supports the following environment variables:
