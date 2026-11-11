@@ -12,7 +12,6 @@
   "author": "redpencil.io",
   "license": "MIT",
   "dependencies": {
-    "cron": "^3.1.6",
-    "fs-extra": "^9.1.0"
+    "cron": "^3.1.6"
   }
 }
