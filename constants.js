@@ -1,5 +1,5 @@
 import { sparqlEscapeUri } from "mu";
-import { VP_GRAPH_URI, KANSELARIJ_GRAPH_URI, EMAIL_GRAPH_URI } from "./config";
+import { VP_GRAPH_URI, KANSELARIJ_GRAPH_URI, EMAIL_GRAPH_URI } from "./env";
 
 const RESOURCE_BASE = "http://themis.vlaanderen.be/id/";
 

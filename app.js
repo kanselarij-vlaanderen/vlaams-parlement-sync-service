@@ -16,7 +16,7 @@ import {
 } from './lib/piece';
 import {
   PARLIAMENT_FLOW_STATUSES
-} from './config';
+} from './env';
 
 import { syncFlowsByStatus, syncIncomingFlows, syncSubmittedFlows } from './lib/sync';
 import { JobManager, cleanupOngoingJobs, createJob, getJob } from "./lib/jobs";
